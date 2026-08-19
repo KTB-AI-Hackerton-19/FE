@@ -7,8 +7,8 @@ export const profileAvatarStyles = cva(
       size: {
         sm: 'size-[34px] text-xs',
         md: 'size-10 text-sm',
-        lg: 'size-14 font-serif text-xl',
-        xl: 'size-20 font-serif text-[28px]',
+        lg: 'size-14 font-title text-xl',
+        xl: 'size-20 font-title text-[28px]',
       },
     },
     defaultVariants: {

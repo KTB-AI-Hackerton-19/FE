@@ -82,7 +82,7 @@ function ProfileEditModal({ user, onClose }: ProfileEditModalProps) {
 
   return (
     <Modal onClose={handleClose} size="sm" hideClose>
-      <h2 className="mb-5 font-serif text-[21px]">프로필 수정</h2>
+      <h2 className="mb-5 font-title font-bold text-[21px]">프로필 수정</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col items-center gap-2.5">

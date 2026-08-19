@@ -18,7 +18,9 @@ function StatCard({ icon: Icon, label, value, detail, tone }: StatCardProps) {
       </div>
       <div className="sm:grid sm:flex-1 sm:grid-cols-[auto_auto] sm:items-end">
         <span className="mt-2 block text-[11px] text-[#858079] sm:col-span-2 sm:mt-0">{label}</span>
-        <strong className="mt-[3px] block font-serif text-[19px] sm:text-2xl">{value}</strong>
+        <strong className="mt-[3px] block font-title font-bold text-[19px] sm:text-2xl">
+          {value}
+        </strong>
         <small className="hidden pb-1 text-right text-[9px] text-[#a49f97] sm:block">
           {detail}
         </small>

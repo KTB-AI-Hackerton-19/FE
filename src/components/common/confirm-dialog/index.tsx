@@ -32,7 +32,7 @@ function ConfirmDialog({
       <div className="mx-auto grid size-12 place-items-center rounded-[15px] bg-coral-soft text-coral-deep">
         {icon}
       </div>
-      <h2 className="mt-3.5 mb-1.5 text-center font-serif text-[21px] font-bold">{title}</h2>
+      <h2 className="mt-3.5 mb-1.5 text-center font-title font-bold text-[21px]">{title}</h2>
       {description ? (
         <div className="mb-5 text-center text-[11px] leading-[1.8] text-[#8e8880]">
           {description}

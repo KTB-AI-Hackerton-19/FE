@@ -56,7 +56,7 @@ function MonthCalendar({ today }: MonthCalendarProps) {
           >
             <ChevronLeft size={17} />
           </button>
-          <h2 className="min-w-[120px] text-center font-serif text-xl">
+          <h2 className="min-w-[120px] text-center font-title font-bold text-xl">
             {year}년 {month}월
           </h2>
           <button
@@ -133,7 +133,7 @@ function MonthCalendar({ today }: MonthCalendarProps) {
         <span className="text-[10px] font-bold text-[#dd725f]">
           {formatKoreanDate(selectedDate)}
         </span>
-        <h2 className="mt-[3px] mb-3 font-serif text-xl">이날의 마음</h2>
+        <h2 className="mt-[3px] mb-3 font-title font-bold text-xl">이날의 마음</h2>
 
         {selectedDay && selectedDay.events.length > 0 ? (
           <div className="grid gap-[9px]">

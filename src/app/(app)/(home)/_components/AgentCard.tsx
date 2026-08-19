@@ -24,7 +24,7 @@ function AgentCard() {
         <div className="inline-flex items-center gap-[7px] rounded-[20px] bg-white/10 px-[11px] py-[7px] text-[11px] font-bold text-[#cce3d7]">
           <Sparkles size={16} /> 마음 에이전트가 발견했어요
         </div>
-        <h2 className="mt-[15px] mb-[7px] font-serif text-[21px] lg:text-[25px]">
+        <h2 className="mt-[15px] mb-[7px] font-title font-bold text-[21px] lg:text-[25px]">
           {insight.title}
         </h2>
         <p className="mb-[22px] text-xs leading-[1.7] text-[#d2ded9]">{insight.message}</p>
@@ -48,7 +48,9 @@ function AgentCard() {
           <span className="w-full bg-[#e98170] p-[9px] text-center text-xs font-bold tracking-[0.15em] text-white">
             {insight.monthLabel}
           </span>
-          <strong className="font-serif text-[51px] leading-[1.2]">{insight.dayLabel}</strong>
+          <strong className="font-title font-bold text-[51px] leading-[1.2]">
+            {insight.dayLabel}
+          </strong>
           <small className="text-[#7e7973]">{insight.caption}</small>
         </div>
         <div className="absolute right-[3px] bottom-[5px] grid size-[72px] place-items-center rounded-full bg-[#f1d397] text-[38px] shadow-[0_13px_24px_#172b2438]">

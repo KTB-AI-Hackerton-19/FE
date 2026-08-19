@@ -102,7 +102,7 @@ function PeopleList() {
             const isSelected = selectedIds.includes(person.id);
             const avatar = (
               <div
-                className={`grid size-[47px] shrink-0 place-items-center rounded-2xl font-serif text-[19px] ${
+                className={`grid size-[47px] shrink-0 place-items-center rounded-2xl font-title font-bold text-[19px] ${
                   AVATAR_TONES[index % AVATAR_TONES.length]
                 }`}
               >

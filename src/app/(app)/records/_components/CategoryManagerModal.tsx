@@ -87,7 +87,7 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="mb-1.5 font-serif text-[21px]">선물 카테고리</h2>
+      <h2 className="mb-1.5 font-title font-bold text-[21px]">선물 카테고리</h2>
       <p className="mb-3 text-[11px] leading-[1.7] text-[#8e8880]">
         기록을 분류하는 카테고리예요. 추가하면 기록 모달과 필터에 바로 나타나요.
       </p>

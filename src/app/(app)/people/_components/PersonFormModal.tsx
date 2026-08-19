@@ -66,7 +66,9 @@ function PersonFormModal({ person, onClose }: PersonFormModalProps) {
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="mb-1.5 font-serif text-[21px]">{isEdit ? '정보 수정' : '사람 등록'}</h2>
+      <h2 className="mb-1.5 font-title font-bold text-[21px]">
+        {isEdit ? '정보 수정' : '사람 등록'}
+      </h2>
       <p className="mb-5 text-[11px] leading-[1.7] text-[#8e8880]">
         생일과 성별을 넣어두면 홈 화면 에이전트 카드와 선물 추천에 반영돼요.
       </p>
