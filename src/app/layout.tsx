@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 
-import AppShell from '@/components/common/app-shell';
 import '@/styles/globals.css';
 
 import { baloo2, gowunBatang, notoSansKr } from './fonts';
@@ -23,9 +22,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${notoSansKr.variable} ${gowunBatang.variable} ${baloo2.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#f1efeb] font-sans lg:bg-cream">
-        <Providers>
-          <AppShell>{children}</AppShell>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,29 +1,43 @@
-export type CategoryT =
-  '디저트' | '꽃·식물' | '부조금' | '패션·잡화' | '상품권' | '생활용품' | '기타';
+import type { AccentT } from './category';
 
-export type AccentT = 'mint' | 'pink' | 'blue' | 'gold';
+export type RecordStatusT = 'DRAFT' | 'CONFIRMED';
 
-export type RecordT = {
+export type GiftRecordT = {
   id: number;
+  personId: number | null;
   person: string;
-  relation: string;
-  /** 선물을 받은 날 (YYYY-MM-DD) */
+  relation: string | null;
   date: string;
-  /** 답례를 준비할 날 (YYYY-MM-DD) */
-  reminderDate: string;
-  occasion: string;
+  reminderDate: string | null;
+  occasion: string | null;
   gift: string;
-  category: CategoryT;
+  categoryId: number | null;
+  category: string;
+  amount: number;
+  /** 화면 표시용 포맷 문자열 — 그대로 출력한다 (직접 파싱 금지) */
   price: string;
-  accent: AccentT;
+  emoji: string;
+  color: AccentT;
   thanked: boolean;
+  extractedSenderName: string | null;
+  extractedRelationship: string | null;
+  /** 15분 만료 presigned GET URL — 캐싱하지 않는다 */
+  imageUrl: string | null;
+  status: RecordStatusT;
+  createdAt: string;
 };
 
-export type RecordDraftT = Omit<RecordT, 'id' | 'accent' | 'thanked'>;
-
-export type PersonT = {
-  name: string;
-  relation: string;
-  records: RecordT[];
-  latest: RecordT;
+/** 목록 조회 필터 — 클라이언트에서 거르지 않고 서버에 그대로 넘긴다. */
+export type GiftRecordQueryT = {
+  category?: string;
+  categoryId?: number;
+  personId?: number;
+  thanked?: boolean;
+  status?: RecordStatusT;
+  startDate?: string;
+  endDate?: string;
+  q?: string;
+  sort?: 'latest' | 'oldest' | 'amount' | 'created';
+  page?: number;
+  size?: number;
 };

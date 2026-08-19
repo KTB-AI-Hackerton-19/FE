@@ -13,35 +13,29 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · TanStack
 ```
 src/
 ├── app/                        # Next.js App Router
-│   ├── layout.tsx              # RSC — html/body, 폰트, Providers, AppShell
+│   ├── layout.tsx              # RSC — html/body, 폰트, Providers
 │   ├── providers.tsx           # QueryClientProvider + AppUiProvider
-│   ├── fonts/                  # next/font 정의
-│   ├── (home)/                 # 홈 — 라우트 그룹(URL은 '/')
-│   │   ├── page.tsx
-│   │   ├── _components/
-│   │   └── _consts/
-│   ├── records/
+│   ├── fonts/                  # next/font 정의 (본문·제목·로고)
+│   ├── login/                  # 로그인·회원가입 (셸 밖, 인증 불필요)
 │   │   ├── page.tsx
 │   │   └── _components/
-│   ├── people/
-│   │   ├── page.tsx
-│   │   ├── _components/
-│   │   └── [name]/
-│   │       ├── page.tsx
-│   │       └── _components/
-│   └── calendar/
-│       ├── page.tsx
-│       └── _components/
+│   └── (app)/                  # 로그인이 필요한 화면 전체
+│       ├── layout.tsx          # AuthGuard + AppShell
+│       ├── (home)/             # 홈 — 라우트 그룹(URL은 '/')
+│       ├── records/
+│       ├── people/
+│       │   └── [id]/
+│       └── calendar/
 ├── components/common/          # app/ 밖 — top-level 라우트 간 공유 + 범용 UI
 │   └── {component-name}/       # 폴더명: kebab-case
 │       ├── index.tsx           # 컴포넌트 본체 (default export)
 │       ├── {componentName}.style.ts   # cva variants (스타일 분리 시)
 │       └── {componentName}.const.ts   # 상수/타입 (필요 시)
-├── apis/                       # API 호출 함수 (HTTP 메서드 prefix)
+├── apis/                       # apiClient + 엔드포인트별 호출 함수
 ├── hooks/                      # 커스텀 훅 · API 훅
-├── utils/                      # 공통 유틸리티
-├── types/                      # 공통 타입 (T suffix)
-├── consts/                     # 상수
+├── utils/                      # 공통 유틸리티 (formatDate, tokenStorage)
+├── types/                      # 서버 응답 타입 (T suffix)
+├── consts/                     # 엔드포인트·쿼리키·내비게이션 상수
 └── styles/globals.css          # Tailwind import + 디자인 토큰
 ```
 
@@ -80,12 +74,71 @@ src/
 
 Path alias: `@/*` → `src/*`
 
-## 🌐 API 컨벤션
+## 🌐 백엔드 연동
 
-- 엔드포인트는 `src/consts/api.ts`에 상수로 모은다. 쿼리 키도 여기(`QUERY_KEY`).
-- 도메인 모델 타입은 `src/types/<domain>.ts`.
-- API 함수 위치: 단일 페이지 전용 → `app/<route>/_apis/`, 2개 이상 공유 → `src/apis/`.
-- **현재 `src/apis/`는 localStorage 기반 목 구현**(`recordStorage.ts`). Spring Boot 서버가 준비되면 `getRecords`/`postRecord` 본문만 HTTP 호출로 교체하면 되고, 훅·컴포넌트는 건드릴 필요 없다.
+백엔드: `인간관계 지킴이 API` (Spring Boot). Swagger에 모든 필드 한글 설명이 있고, 응답 필드가 화면 필드명과 1:1로 맞춰져 있다.
+
+### 공통 응답 포맷
+
+```json
+{ "success": true,  "data": { ... }, "error": null }
+{ "success": false, "data": null,    "error": { "code": "...", "message": "..." } }
+```
+
+`src/apis/apiClient.ts`가 이 포맷을 벗겨 `data`만 돌려주고, 실패면 `ApiError(code, message, status)`를 던진다. **컴포넌트에서 `success`를 직접 보지 않는다.**
+
+### 에러 코드
+
+OpenAPI 명세에는 모든 엔드포인트가 `200`만 선언되어 있어 에러 응답이 문서화되어 있지 않다. 아래는 실제 호출로 확인한 것이다.
+
+| status | code                                                                                   | 상황                                                                    |
+| ------ | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 400    | `INVALID_INPUT`                                                                        | 필수값 누락·검증 실패 (message 에 한글 사유가 담긴다)                   |
+| 400    | `INVALID_FILE_TYPE`                                                                    | presigned URL 요청의 확장자·Content-Type 불허                           |
+| 401    | `UNAUTHORIZED`                                                                         | 토큰 없음                                                               |
+| 401    | `INVALID_TOKEN`                                                                        | 만료·위조 토큰, 잘못된 refreshToken                                     |
+| 401    | `LOGIN_FAILED`                                                                         | 아이디·비밀번호 불일치                                                  |
+| 404    | `GIFT_RECORD_NOT_FOUND` / `PERSON_NOT_FOUND` / `CATEGORY_NOT_FOUND` / `USER_NOT_FOUND` | 없거나 내 소유가 아닌 리소스                                            |
+| 500    | `INTERNAL_SERVER_ERROR`                                                                | 그 외 (예: 날짜를 `YYYY-MM-DD` 가 아닌 형식으로 보내면 여기로 떨어진다) |
+
+`error.message`는 한글 문장이라 그대로 사용자에게 보여줘도 된다. 코드로 분기가 필요할 때만 `ApiError.code`를 본다.
+
+### 인증
+
+- `/health`, `/api/auth/**`를 뺀 모든 API가 `Authorization: Bearer <accessToken>` 필수
+- 액세스 토큰 12시간 / 리프레시 7일. 토큰은 localStorage(`src/utils/tokenStorage.ts`)
+- 401이 오면 apiClient가 **한 번만** refresh 후 재시도한다(동시 요청은 single-flight). 실패하면 토큰을 지우고 `/login`으로 보낸다
+- 화면 보호는 `(app)/layout.tsx`의 `AuthGuard`가 담당 — 토큰이 localStorage에 있어 서버에서는 로그인 여부를 알 수 없다
+
+### 프록시
+
+`next.config.ts`의 rewrite로 `/api/*`를 백엔드로 넘긴다. 백엔드가 인증 경로의 **OPTIONS preflight를 401로 막고 있어** 브라우저에서 직접 호출이 불가능하기 때문이다. 같은 오리진이 되므로 preflight 자체가 발생하지 않는다.
+
+- `API_PROXY_TARGET` (서버 전용) — 프록시 대상 백엔드 주소
+- `NEXT_PUBLIC_API_BASE_URL` — 비우면 같은 오리진(프록시). 백엔드 CORS가 고쳐지면 여기에 백엔드 주소를 넣어 직접 호출로 전환
+
+ngrok 주소는 백엔드를 재기동할 때마다 바뀌므로 `.env.local`을 갱신해야 한다.
+
+**데모 계정**: `demo` / `demo1234` — 백엔드에서 만들어 준 계정으로 기록 12건·사람 7명이 시드되어 있다. H2 인메모리 DB라 백엔드를 재기동하면 사라질 수 있으니, 로그인이 안 되면 회원가입으로 새로 만들면 된다.
+
+### 백엔드가 정한 규칙 (지킬 것)
+
+- **금액을 파싱하지 않는다** — 표시는 `price`("35,000원"), 계산은 `amount`(35000). 요청은 `price` 하나로 보내고 숫자·문자열 아무거나 허용된다
+- **카테고리·이모지·색을 하드코딩하지 않는다** — `GET /api/categories`로 그린다. 기록 응답의 `emoji`·`color`도 서버가 내려준다
+- **사람을 미리 등록하지 않는다** — 기록 저장 시 `personName`·`relation`만 보내면 자동 생성된다
+- **`imageUrl`을 캐싱하지 않는다** — 15분 만료 presigned URL이라 응답마다 값이 다르다
+- **목록 필터는 서버에서 처리한다** — 전체를 받아 클라이언트에서 거르지 말고 `category`·`q`·`startDate` 파라미터를 쓴다
+- **빈 상태를 처리한다** — 데이터가 없으면 `agentInsight`는 `null`, `days`·`content`는 빈 배열
+
+### 이미지 업로드 흐름
+
+`POST /api/gift-assets/presigned-url` → 받은 `uploadUrl`로 **S3에 직접 PUT**(백엔드 경유 X, 인증 헤더 붙이면 안 됨) → `imageKey`를 `POST /api/gift-records/extract`로 전달 → AI가 `DRAFT` 기록 생성 → 사용자가 확인·수정 후 `PATCH /api/gift-records/{id}` (`confirm: true`)로 확정. `src/apis/uploadImage.ts`의 `uploadGiftImage`가 앞 두 단계를 묶는다.
+
+### API 컨벤션
+
+- 엔드포인트와 쿼리 키는 `src/consts/api.ts`에 상수로 모은다
+- 도메인 타입은 `src/types/<domain>.ts`, T suffix
+- API 함수 위치: 단일 페이지 전용 → `app/<route>/_apis/`, 2개 이상 공유 → `src/apis/`
 
 ### API 훅 반환값 네이밍
 
@@ -93,15 +146,15 @@ Path alias: `@/*` → `src/*`
 
 ```ts
 // Query — data를 도메인명 + Data로
-export const useGetRecords = () => {
-  const { data: recordsData = STARTER_RECORDS } = useQuery({ ... });
-  return { recordsData };
+export const useGetDashboard = () => {
+  const { data: dashboardData } = useQuery({ ... });
+  return { dashboardData };
 };
 
 // Mutation — mutate/isPending에 API 함수명 + Mutation/Pending 접미
-export const usePostRecord = () => {
-  const { mutate: postRecordMutation, isPending: isPostRecordPending } = useMutation({ ... });
-  return { postRecordMutation, isPostRecordPending };
+export const usePostGiftRecord = () => {
+  const { mutate: postGiftRecordMutation, isPending: isPostGiftRecordPending } = useMutation({ ... });
+  return { postGiftRecordMutation, isPostGiftRecordPending };
 };
 ```
 

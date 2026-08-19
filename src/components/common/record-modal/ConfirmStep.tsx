@@ -5,7 +5,7 @@ import { Check, Heart } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import Button from '@/components/common/button';
-import { CATEGORIES } from '@/consts/record';
+import { useGetCategories } from '@/hooks/useGetCategories';
 
 import { recordFormSchema } from './recordModal.const';
 import type { RecordFormT } from './recordModal.const';
@@ -18,11 +18,13 @@ const labelTextClass = 'text-[10px] font-bold text-[#817b74]';
 type ConfirmStepProps = {
   defaultValues: RecordFormT;
   isPending: boolean;
+  isDraft: boolean;
   onBack: () => void;
   onSubmit: (values: RecordFormT) => void;
 };
 
-function ConfirmStep({ defaultValues, isPending, onBack, onSubmit }: ConfirmStepProps) {
+function ConfirmStep({ defaultValues, isPending, isDraft, onBack, onSubmit }: ConfirmStepProps) {
+  const { categoriesData } = useGetCategories();
   const {
     register,
     handleSubmit,
@@ -39,7 +41,9 @@ function ConfirmStep({ defaultValues, isPending, onBack, onSubmit }: ConfirmStep
       <div className="mx-auto grid size-12 place-items-center rounded-[15px] bg-[#eaf4ee] text-[#648673]">
         <Check />
       </div>
-      <h2 className="mt-3.5 mb-1.5 text-center font-serif text-[23px]">이렇게 기록하면 될까요?</h2>
+      <h2 className="mt-3.5 mb-1.5 text-center font-serif text-[23px]">
+        {isDraft ? '이렇게 기록하면 될까요?' : '마음을 기록할게요'}
+      </h2>
       <p className="mb-[19px] text-center text-[11px] leading-[1.7] text-[#8e8880]">
         금액과 카테고리, 알림일을 확인해주세요.
       </p>
@@ -47,7 +51,7 @@ function ConfirmStep({ defaultValues, isPending, onBack, onSubmit }: ConfirmStep
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
         <label className={labelClass}>
           <span className={labelTextClass}>보낸 사람</span>
-          <input className={fieldClass} {...register('person')} />
+          <input className={fieldClass} {...register('personName')} />
         </label>
         <label className={labelClass}>
           <span className={labelTextClass}>관계</span>
@@ -67,13 +71,16 @@ function ConfirmStep({ defaultValues, isPending, onBack, onSubmit }: ConfirmStep
         </label>
         <label className={labelClass}>
           <span className={labelTextClass}>금액</span>
-          <input className={fieldClass} {...register('price')} />
+          <input className={fieldClass} placeholder="35,000원" {...register('price')} />
         </label>
         <label className={labelClass}>
           <span className={labelTextClass}>선물 카테고리</span>
           <select className={fieldClass} {...register('category')}>
-            {CATEGORIES.map(category => (
-              <option key={category}>{category}</option>
+            <option value="">선택</option>
+            {categoriesData.map(category => (
+              <option key={category.id} value={category.name}>
+                {category.emoji} {category.name}
+              </option>
             ))}
           </select>
         </label>
@@ -90,7 +97,7 @@ function ConfirmStep({ defaultValues, isPending, onBack, onSubmit }: ConfirmStep
           다시 입력
         </Button>
         <Button type="submit" disabled={isPending} className="flex-1 sm:flex-none">
-          <Heart size={17} /> 마음 기록하기
+          <Heart size={17} /> {isPending ? '저장 중…' : '마음 기록하기'}
         </Button>
       </div>
     </form>

@@ -1,20 +1,22 @@
 'use client';
 
-import { ImagePlus, Sparkles } from 'lucide-react';
+import { ImagePlus, PenLine, Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import Button from '@/components/common/button';
 
 type UploadStepProps = {
-  onAnalyze: (memo: string) => void;
+  onAnalyze: (file: File) => void;
+  onSkip: () => void;
 };
 
-function UploadStep({ onAnalyze }: UploadStepProps) {
+function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [fileName, setFileName] = useState('');
-  const [memo, setMemo] = useState('');
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleAnalyze = () => onAnalyze(memo);
+  const handleAnalyze = () => {
+    if (file) onAnalyze(file);
+  };
 
   return (
     <>
@@ -31,9 +33,9 @@ function UploadStep({ onAnalyze }: UploadStepProps) {
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/heic"
         hidden
-        onChange={event => setFileName(event.target.files?.[0]?.name ?? '')}
+        onChange={event => setFile(event.target.files?.[0] ?? null)}
       />
       <button
         type="button"
@@ -41,11 +43,15 @@ function UploadStep({ onAnalyze }: UploadStepProps) {
         className="flex h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-[5px] rounded-[14px] border-[1.5px] border-dashed border-[#d8cfc5] bg-[#faf7f3] text-[#d57967]"
       >
         <ImagePlus size={28} />
-        <b className="text-xs text-[#625c55]">{fileName || '사진 또는 캡처 올리기'}</b>
+        <b className="text-xs text-[#625c55]">{file?.name ?? '사진 또는 캡처 올리기'}</b>
         <span className="text-[9px] text-[#a19a92]">
-          {fileName ? '분석할 준비가 되었어요' : 'JPG, PNG · 최대 10MB'}
+          {file ? '분석할 준비가 되었어요' : 'JPG, PNG, HEIC'}
         </span>
       </button>
+
+      <Button full onClick={handleAnalyze} disabled={!file} className="mt-3">
+        <Sparkles size={18} /> AI로 마음 정리하기
+      </Button>
 
       <div className="my-3.5 flex items-center gap-2.5 text-[9px] text-[#aaa49d]">
         <span className="h-px flex-1 bg-line" />
@@ -53,15 +59,8 @@ function UploadStep({ onAnalyze }: UploadStepProps) {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      <textarea
-        value={memo}
-        onChange={event => setMemo(event.target.value)}
-        placeholder="예: 민수가 생일에 스타벅스 케이크를 보내줬어요."
-        className="h-[70px] w-full resize-none rounded-xl border border-line p-[11px] text-[11px] outline-0 focus:border-[#da897a] focus:shadow-[0_0_0_3px_#ed7b6912]"
-      />
-
-      <Button full onClick={handleAnalyze} className="mt-3">
-        <Sparkles size={18} /> AI로 마음 정리하기
+      <Button variant="ghost" full onClick={onSkip}>
+        <PenLine size={17} /> 사진 없이 직접 입력하기
       </Button>
     </>
   );

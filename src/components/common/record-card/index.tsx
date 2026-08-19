@@ -1,21 +1,18 @@
 import { Check, CircleUserRound, Clock3 } from 'lucide-react';
 
-import type { RecordT } from '@/types/record';
+import type { GiftRecordT } from '@/types/record';
 import { formatDate } from '@/utils/formatDate';
-import { getCategoryEmoji } from '@/utils/getCategoryEmoji';
 
 import { recordEmojiStyles } from './recordCard.style';
 
 type RecordCardProps = {
-  record: RecordT;
+  record: GiftRecordT;
 };
 
 function RecordCard({ record }: RecordCardProps) {
   return (
     <article className="relative flex min-w-0 gap-[13px] rounded-[15px] border border-line bg-white p-4">
-      <div className={recordEmojiStyles({ accent: record.accent })}>
-        {getCategoryEmoji(record.category)}
-      </div>
+      <div className={recordEmojiStyles({ accent: record.color })}>{record.emoji}</div>
 
       <div className="min-w-0 flex-1">
         <div className="flex justify-between gap-[7px] text-[9px] text-subtle">
@@ -26,10 +23,12 @@ function RecordCard({ record }: RecordCardProps) {
         <p className="truncate text-[10px] text-[#77726b]">
           {record.gift} · {record.price}
         </p>
-        <div className="mt-[9px] inline-flex items-center gap-1 rounded-lg bg-[#f6f4f0] px-[7px] py-1 text-[9px] text-[#8f8a82]">
-          <CircleUserRound size={14} />
-          {record.relation}
-        </div>
+        {record.relation ? (
+          <div className="mt-[9px] inline-flex items-center gap-1 rounded-lg bg-[#f6f4f0] px-[7px] py-1 text-[9px] text-[#8f8a82]">
+            <CircleUserRound size={14} />
+            {record.relation}
+          </div>
+        ) : null}
       </div>
 
       <div
