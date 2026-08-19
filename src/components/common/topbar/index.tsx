@@ -1,13 +1,19 @@
 'use client';
 
-import { Bell, Heart, Plus } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 import Button from '@/components/common/button';
+import ProfileAvatar from '@/components/common/profile-avatar';
 import SearchBar from '@/components/common/search-bar';
 import { useAppUi } from '@/hooks/useAppUi';
+import { useDisplayName } from '@/hooks/useAuth';
+import { useGetMe } from '@/hooks/useGetMe';
 
 function Topbar() {
-  const { openRecordModal, showToast } = useAppUi();
+  const { openRecordModal } = useAppUi();
+  const { meData } = useGetMe();
+  const displayName = useDisplayName();
 
   return (
     <header className="sticky top-0 z-25 flex h-[66px] items-center gap-2.5 border-b border-line/70 bg-cream/95 px-5 backdrop-blur-md sm:h-[76px] sm:gap-3 sm:px-6 lg:px-[5.2vw]">
@@ -21,15 +27,10 @@ function Topbar() {
       <SearchBar />
 
       <div className="flex shrink-0 items-center gap-3">
-        {/* 알림은 아직 API를 붙이지 않았다 — UI만 유지한다. */}
-        <button
-          type="button"
-          onClick={() => showToast('알림 기능은 준비 중이에요')}
-          aria-label="알림"
-          className="relative grid size-10 cursor-pointer place-items-center rounded-xl border border-line bg-white text-[#66625c]"
-        >
-          <Bell size={20} />
-        </button>
+        {/* 모바일에는 사이드바가 없어 여기가 마이페이지 진입점이 된다. */}
+        <Link href="/mypage" aria-label="마이페이지" className="lg:hidden">
+          <ProfileAvatar name={displayName} imageUrl={meData?.profileImageUrl} size="md" />
+        </Link>
         {/* Button 의 cva base 인 inline-flex 가 hidden 을 이기므로 래퍼로 감춘다. */}
         <div className="hidden lg:block">
           <Button size="sm" onClick={openRecordModal}>

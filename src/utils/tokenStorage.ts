@@ -37,6 +37,7 @@ export const getUsername = () => read(USERNAME_KEY);
 export const setUsername = (username: string) => write(USERNAME_KEY, username);
 
 export const getDisplayName = () => read(DISPLAY_NAME_KEY);
+export const setDisplayName = (name: string) => write(DISPLAY_NAME_KEY, name);
 
 export const clearTokens = () => {
   write(ACCESS_KEY, null);

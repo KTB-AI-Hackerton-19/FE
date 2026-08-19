@@ -6,6 +6,8 @@ import { apiClient } from './apiClient';
 export type PostPresignedUrlRequestT = {
   fileName: string;
   contentType: string;
+  /** 저장 경로가 갈린다. 생략하면 GIFT */
+  purpose?: 'GIFT' | 'PROFILE';
 };
 
 export const postPresignedUrl = (body: PostPresignedUrlRequestT) =>
@@ -32,12 +34,17 @@ export const putImageToS3 = async ({
 };
 
 /** presigned URL 발급 → S3 업로드까지 한 번에 처리하고 imageKey를 돌려준다. */
-export const uploadGiftImage = async (file: File): Promise<string> => {
+const uploadImage = async (file: File, purpose: PostPresignedUrlRequestT['purpose']) => {
   const { imageKey, uploadUrl } = await postPresignedUrl({
     fileName: file.name,
     contentType: file.type,
+    purpose,
   });
 
   await putImageToS3({ uploadUrl, file });
   return imageKey;
 };
+
+export const uploadGiftImage = (file: File) => uploadImage(file, 'GIFT');
+
+export const uploadProfileImage = (file: File) => uploadImage(file, 'PROFILE');
