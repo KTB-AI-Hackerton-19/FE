@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPeople } from '@/hooks/useGetPeople';
 import { useDeletePeople } from '@/hooks/usePeopleMutations';
@@ -21,7 +22,13 @@ const AVATAR_TONES = [
 ];
 
 function PeopleList() {
-  const { peopleData, isGetPeoplePending } = useGetPeople();
+  const {
+    peopleData,
+    fetchNextPeoplePage,
+    hasNextPeoplePage,
+    isFetchingNextPeoplePage,
+    isGetPeoplePending,
+  } = useGetPeople();
   const { deletePeopleMutation, isDeletePeoplePending } = useDeletePeople();
   const { showToast } = useAppUi();
 
@@ -161,6 +168,12 @@ function PeopleList() {
           })}
         </div>
       )}
+
+      <InfiniteScrollSentinel
+        hasMore={hasNextPeoplePage}
+        isFetching={isFetchingNextPeoplePage}
+        onReach={fetchNextPeoplePage}
+      />
 
       {isFormOpen ? <PersonFormModal onClose={() => setIsFormOpen(false)} /> : null}
 
