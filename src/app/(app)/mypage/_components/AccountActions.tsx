@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
+import SadGiftIcon from '@/assets/icons/SadGiftIcon';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import LogoutConfirmDialog from '@/components/common/logout-confirm-dialog';
-import SadGiftIcon from '@/components/common/sad-gift-icon';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useLogoutFlow } from '@/hooks/useLogoutFlow';

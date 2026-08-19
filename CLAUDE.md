@@ -36,8 +36,12 @@ src/
 ├── utils/                      # 공통 유틸리티 (formatDate, tokenStorage)
 ├── types/                      # 서버 응답 타입 (T suffix)
 ├── consts/                     # 엔드포인트·쿼리키·내비게이션 상수
+├── assets/                     # 정적 리소스 (SVG, 이미지)
+│   └── icons/                  # 직접 그린 SVG 아이콘 — 파일명 PascalCase
 └── styles/globals.css          # Tailwind import + 디자인 토큰
 ```
+
+**아이콘**: 기본은 `lucide-react`. lucide에 없는 모양만 `assets/icons/`에 SVG 컴포넌트로 직접 그린다. 색은 `currentColor`로 받아 쓰는 쪽 텍스트 색을 따르게 한다. 브라우저가 URL로 직접 요청하는 파일(파비콘 등)만 `public/`에 둔다.
 
 **홈이 `(home)` 라우트 그룹인 이유**: `app/_components/`는 금지 규칙이라, 홈 전용 컴포넌트를 둘 곳이 필요하다. 라우트 그룹은 URL에 영향을 주지 않으면서(`/` 유지) 홈에도 `_components/`를 줄 수 있다.
 
