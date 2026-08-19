@@ -1,4 +1,4 @@
-import type { AccentT } from './category';
+import type { AccentT, KindFilterT, KindT } from './category';
 
 export type RecordStatusT = 'DRAFT' | 'CONFIRMED';
 
@@ -23,6 +23,11 @@ export type GiftRecordT = {
   extractedRelationship: string | null;
   /** 15분 만료 presigned GET URL — 캐싱하지 않는다 */
   imageUrl: string | null;
+  kind: KindT;
+  /** '선물' · '경사' · '조사' — 그대로 출력한다 */
+  kindLabel: string;
+  /** 경조사 기록이면 true */
+  event: boolean;
   status: RecordStatusT;
   createdAt: string;
 };
@@ -32,7 +37,10 @@ export type GiftRecordQueryT = {
   category?: string;
   categoryId?: number;
   personId?: number;
+  /** 보낸 사람 이름으로만 좁힌다 — 통합 검색(q)과 달리 선물명·사유는 보지 않는다 */
+  personName?: string;
   thanked?: boolean;
+  kind?: KindFilterT;
   status?: RecordStatusT;
   startDate?: string;
   endDate?: string;
