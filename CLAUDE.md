@@ -114,14 +114,16 @@ OpenAPI 명세에는 모든 엔드포인트가 `200`만 선언되어 있어 에�
 - 401이 오면 apiClient가 **한 번만** refresh 후 재시도한다(동시 요청은 single-flight). 실패하면 토큰을 지우고 `/login`으로 보낸다
 - 화면 보호는 `(app)/layout.tsx`의 `AuthGuard`가 담당 — 토큰이 localStorage에 있어 서버에서는 로그인 여부를 알 수 없다
 
-### 프록시
+### API 주소
 
-`next.config.ts`의 rewrite로 `/api/*`를 백엔드로 넘긴다. 백엔드가 인증 경로의 **OPTIONS preflight를 401로 막고 있어** 브라우저에서 직접 호출이 불가능하기 때문이다. 같은 오리진이 되므로 preflight 자체가 발생하지 않는다.
+백엔드는 `https://api.giftie.site`에 배포되어 있고 CORS가 열려 있어(preflight 200, 요청 Origin을 그대로 반영) **브라우저에서 직접 호출한다.**
 
-- `API_PROXY_TARGET` (서버 전용) — 프록시 대상 백엔드 주소
-- `NEXT_PUBLIC_API_BASE_URL` — 비우면 같은 오리진(프록시). 백엔드 CORS가 고쳐지면 여기에 백엔드 주소를 넣어 직접 호출로 전환
+- `NEXT_PUBLIC_API_BASE_URL` — 백엔드 주소. 직접 호출 경로
+- `API_PROXY_TARGET` (서버 전용) — 위 값을 비웠을 때 `next.config.ts`의 rewrite가 `/api/*`를 넘길 대상
 
-ngrok 주소는 백엔드를 재기동할 때마다 바뀌므로 `.env.local`을 갱신해야 한다.
+프록시(rewrite)는 예전에 백엔드가 인증 경로의 OPTIONS preflight를 401로 막던 시절의 폴백이다. 지금은 쓰지 않지만, CORS가 다시 막히거나 로컬 백엔드·ngrok으로 붙어야 할 때를 위해 남겨 둔다. 전환하려면 `NEXT_PUBLIC_API_BASE_URL`을 비우고 `API_PROXY_TARGET`을 채운다.
+
+**환경변수는 배포처에도 넣어야 한다.** `.env*`는 gitignore 대상이라 저장소에 없고, `rewrites()`는 빌드 시점에 평가되므로 값을 바꾸면 재배포가 필요하다.
 
 **데모 계정**: `demo` / `demo1234` — 백엔드에서 만들어 준 계정으로 기록 12건·사람 7명이 시드되어 있다. H2 인메모리 DB라 백엔드를 재기동하면 사라질 수 있으니, 로그인이 안 되면 회원가입으로 새로 만들면 된다.
 
