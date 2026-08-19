@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { useGetCalendar } from '@/hooks/useGetCalendar';
@@ -137,9 +138,11 @@ function MonthCalendar({ today }: MonthCalendarProps) {
         {selectedDay && selectedDay.events.length > 0 ? (
           <div className="grid gap-[9px]">
             {selectedDay.events.map(event => (
-              <article
+              <Link
                 key={`${event.type}-${event.id}`}
-                className="flex items-center gap-3 rounded-[14px] border border-line bg-white p-3.5"
+                href={`/people/${event.personId}`}
+                aria-label={`${event.person}님 상세 보기`}
+                className="flex items-center gap-3 rounded-[14px] border border-line bg-white p-3.5 transition hover:bg-[#fdfaf7]"
               >
                 <div className="grid size-10 place-items-center rounded-xl bg-[#f6eee9] text-xl">
                   {event.emoji}
@@ -156,7 +159,7 @@ function MonthCalendar({ today }: MonthCalendarProps) {
                   </p>
                 </div>
                 <ChevronRight size={17} className="text-[#b1aba3]" />
-              </article>
+              </Link>
             ))}
           </div>
         ) : (
