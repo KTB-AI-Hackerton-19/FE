@@ -109,7 +109,6 @@ function RecordModalContent() {
             defaultValues={form}
             isPending={isSaving}
             isDraft={draftId !== null}
-            onBack={() => setStep('upload')}
             onSubmit={handleSave}
           />
         )}
