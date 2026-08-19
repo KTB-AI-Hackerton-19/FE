@@ -22,7 +22,7 @@ function RecordFilterList() {
 
   return (
     <>
-      <div className="scrollbar-none flex gap-2 overflow-auto pb-[5px]">
+      <div className="flex gap-2 overflow-auto pb-[5px]">
         {categories.map(category => (
           <button
             key={category}

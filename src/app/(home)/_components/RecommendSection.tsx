@@ -29,7 +29,7 @@ function RecommendSection() {
         }
       />
 
-      <section className="scrollbar-none flex snap-x snap-mandatory gap-[15px] overflow-auto lg:grid lg:grid-cols-3 lg:overflow-visible">
+      <section className="flex snap-x snap-mandatory gap-[15px] overflow-auto lg:grid lg:grid-cols-3 lg:overflow-visible">
         {RECOMMENDATIONS.map((item, index) => (
           <article
             key={item.name}

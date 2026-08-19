@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/common/app-shell';
 import '@/styles/globals.css';
 
-import { gowunBatang, notoSansKr } from './fonts';
+import { baloo2, gowunBatang, notoSansKr } from './fonts';
 import Providers from './providers';
 
 export const metadata: Metadata = {
@@ -18,7 +18,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="ko" className={`${notoSansKr.variable} ${gowunBatang.variable} h-full antialiased`}>
+    <html
+      lang="ko"
+      className={`${notoSansKr.variable} ${gowunBatang.variable} ${baloo2.variable} h-full antialiased`}
+    >
       <body className="min-h-full bg-[#f1efeb] font-sans lg:bg-cream">
         <Providers>
           <AppShell>{children}</AppShell>

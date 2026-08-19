@@ -13,7 +13,7 @@ function Sidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-[244px] flex-col border-r border-line bg-white px-[18px] pt-[30px] pb-[22px] lg:flex">
-      <div className="flex items-center gap-[11px] px-2.5 pb-8 font-serif text-[22px] font-bold">
+      <div className="flex items-center gap-[11px] px-2.5 pb-8 font-logo text-[24px] font-extrabold tracking-[-0.01em]">
         <div className="grid size-9 place-items-center rounded-[13px_13px_13px_5px] bg-coral text-white shadow-[0_8px_20px_#ed7b6935]">
           <Heart size={20} fill="currentColor" />
         </div>

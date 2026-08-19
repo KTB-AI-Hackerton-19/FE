@@ -10,7 +10,7 @@ function Topbar() {
 
   return (
     <header className="sticky top-0 z-5 flex h-[66px] items-center justify-between gap-3 border-b border-line/70 bg-cream/95 px-[18px] backdrop-blur-md sm:h-[76px] lg:justify-end lg:px-[5.2vw]">
-      <div className="flex items-center gap-[7px] font-serif text-base text-coral-deep lg:hidden">
+      <div className="flex items-center gap-[7px] font-logo text-[18px] font-extrabold tracking-[-0.01em] text-coral-deep lg:hidden">
         <Heart size={17} fill="currentColor" /> Giftie
       </div>
 
