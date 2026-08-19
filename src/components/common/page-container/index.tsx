@@ -9,7 +9,7 @@ function PageContainer({ children, subpage = false, narrow = false }: PageContai
   return (
     <main
       className={[
-        'mx-auto w-full px-[15px] pb-[103px] sm:px-[18px] lg:px-[5.2vw] lg:pb-20',
+        'mx-auto w-full px-5 pb-[103px] sm:px-6 lg:px-[5.2vw] lg:pb-20',
         narrow ? 'max-w-[920px]' : 'max-w-[1180px]',
         subpage ? 'pt-7 lg:pt-12' : 'pt-[18px] sm:pt-6 lg:pt-[45px]',
       ].join(' ')}

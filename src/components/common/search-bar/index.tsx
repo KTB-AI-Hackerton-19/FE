@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGetSearch } from '@/hooks/useGetSearch';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { formatDate } from '@/utils/formatDate';
 
 function SearchBar() {
@@ -16,6 +17,9 @@ function SearchBar() {
 
   const debouncedKeyword = useDebouncedValue(keyword);
   const { searchData, isGetSearchFetching } = useGetSearch(debouncedKeyword);
+
+  // 모바일은 로고에 자리를 내주느라 검색창이 좁아 문구를 줄인다.
+  const isCompact = useMediaQuery('(max-width: 1023px)');
 
   // 바깥을 누르면 결과 패널을 닫는다.
   useEffect(() => {
@@ -38,7 +42,7 @@ function SearchBar() {
   const isEmpty = hasKeyword && !isGetSearchFetching && people.length === 0 && records.length === 0;
 
   return (
-    <div ref={containerRef} className="relative mr-auto hidden w-[310px] lg:block">
+    <div ref={containerRef} className="relative mr-auto w-full min-w-0 lg:w-[420px]">
       <div className="flex items-center gap-2.5 rounded-xl border border-line bg-white px-[13px] py-2.5 text-subtle">
         <Search size={18} />
         <input
@@ -50,7 +54,7 @@ function SearchBar() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={event => event.key === 'Escape' && close()}
           className="w-full min-w-0 border-0 text-[13px] text-ink outline-0"
-          placeholder="사람이나 선물을 검색해보세요"
+          placeholder={isCompact ? '사람·선물 검색' : '사람 또는 선물을 검색해보세요'}
         />
         {keyword ? (
           <button

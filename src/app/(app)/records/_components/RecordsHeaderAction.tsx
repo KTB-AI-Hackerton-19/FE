@@ -9,9 +9,12 @@ function RecordsHeaderAction() {
   const { openRecordModal } = useAppUi();
 
   return (
-    <Button onClick={openRecordModal} className="hidden lg:inline-flex">
-      <Plus size={17} /> 기록하기
-    </Button>
+    // Button 의 cva base 인 inline-flex 가 hidden 을 이기므로 래퍼로 감춘다.
+    <div className="hidden lg:block">
+      <Button onClick={openRecordModal}>
+        <Plus size={17} /> 기록하기
+      </Button>
+    </div>
   );
 }
 
