@@ -1,30 +1,28 @@
 'use client';
 
 import { Heart, LogOut, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
-import ConfirmDialog from '@/components/common/confirm-dialog';
+import LogoutConfirmDialog from '@/components/common/logout-confirm-dialog';
 import NavItem from '@/components/common/nav-item';
+import ProfileAvatar from '@/components/common/profile-avatar';
 import { NAV_ITEMS } from '@/consts/nav';
-import { useDisplayName, useLogout } from '@/hooks/useAuth';
+import { useDisplayName } from '@/hooks/useAuth';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
+import { useGetMe } from '@/hooks/useGetMe';
+import { useLogoutFlow } from '@/hooks/useLogoutFlow';
 
 function Sidebar() {
   const pathname = usePathname();
   const { dashboardData } = useGetDashboard();
+  const { meData } = useGetMe();
   const displayName = useDisplayName();
-  const logout = useLogout();
 
-  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { isConfirmOpen, isLoggingOut, openLogoutConfirm, closeLogoutConfirm, confirmLogout } =
+    useLogoutFlow();
 
   const totalRecords = dashboardData?.stats.totalRecords ?? 0;
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await logout();
-  };
 
   return (
     <>
@@ -59,16 +57,21 @@ function Sidebar() {
         </div>
 
         <div className="mt-[17px] flex items-center gap-2.5 border-t border-line px-[5px] pt-3">
-          <div className="grid size-[34px] place-items-center rounded-full bg-[#e8d2c2] font-bold text-[#795642] uppercase">
-            {displayName?.[0] ?? '?'}
-          </div>
-          <div className="flex flex-1 flex-col text-xs">
-            <b>{displayName ?? '사용자'}</b>
-            <span className="mt-0.5 text-[10px] text-[#99948c]">마음 {totalRecords}개 기록 중</span>
-          </div>
+          <Link
+            href="/mypage"
+            className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl transition hover:opacity-70"
+          >
+            <ProfileAvatar name={displayName} imageUrl={meData?.profileImageUrl} />
+            <span className="flex min-w-0 flex-col text-xs">
+              <b className="truncate">{displayName ?? '사용자'}</b>
+              <span className="mt-0.5 text-[10px] text-[#99948c]">
+                마음 {totalRecords}개 기록 중
+              </span>
+            </span>
+          </Link>
           <button
             type="button"
-            onClick={() => setIsLogoutConfirmOpen(true)}
+            onClick={openLogoutConfirm}
             aria-label="로그아웃"
             className="cursor-pointer text-subtle hover:text-ink"
           >
@@ -78,16 +81,11 @@ function Sidebar() {
       </aside>
 
       {/* aside 가 z-10 스태킹 컨텍스트라, 다이얼로그는 그 밖에서 띄워야 헤더(z-25) 위로 올라온다. */}
-      {isLogoutConfirmOpen ? (
-        <ConfirmDialog
-          title="로그아웃 하시겠어요?"
-          description="기록한 마음은 그대로 남아 있어요."
-          icon={<LogOut size={22} />}
-          confirmLabel="로그아웃"
-          cancelLabel="유지하기"
+      {isConfirmOpen ? (
+        <LogoutConfirmDialog
           isPending={isLoggingOut}
-          onConfirm={handleLogout}
-          onCancel={() => setIsLogoutConfirmOpen(false)}
+          onConfirm={confirmLogout}
+          onCancel={closeLogoutConfirm}
         />
       ) : null}
     </>

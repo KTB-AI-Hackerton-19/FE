@@ -14,7 +14,7 @@ function SectionHeading({ title, description, label, action, id }: SectionHeadin
     >
       <div>
         {label}
-        <h2 className="mb-[5px] font-serif text-[22px] tracking-[-0.03em]">{title}</h2>
+        <h2 className="mb-[5px] font-title font-bold text-[22px] tracking-[-0.03em]">{title}</h2>
         {description ? <p className="text-[11px] text-[#948f87]">{description}</p> : null}
       </div>
       {action}

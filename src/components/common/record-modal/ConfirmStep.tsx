@@ -41,7 +41,7 @@ function ConfirmStep({ defaultValues, isPending, isDraft, onBack, onSubmit }: Co
       <div className="mx-auto grid size-12 place-items-center rounded-[15px] bg-[#eaf4ee] text-[#648673]">
         <Check />
       </div>
-      <h2 className="mt-3.5 mb-1.5 text-center font-serif text-[23px]">
+      <h2 className="mt-3.5 mb-1.5 text-center font-title font-bold text-[23px]">
         {isDraft ? '이렇게 기록하면 될까요?' : '마음을 기록할게요'}
       </h2>
       <p className="mb-[19px] text-center text-[11px] leading-[1.7] text-[#8e8880]">

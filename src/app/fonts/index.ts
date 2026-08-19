@@ -1,18 +1,11 @@
-import { Baloo_2, Gowun_Batang, Noto_Sans_KR } from 'next/font/google';
+import { Baloo_2 } from 'next/font/google';
 
-export const notoSansKr = Noto_Sans_KR({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-noto-sans-kr',
-  display: 'swap',
-});
-
-export const gowunBatang = Gowun_Batang({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-gowun-batang',
-  display: 'swap',
-});
+/**
+ * 본문·제목은 Pretendard 를 쓴다.
+ * Google Fonts 에 없어 `public/fonts/pretendard/pretendard.css` 를 자체 호스팅한다 —
+ * unicode-range 로 92개 청크가 나뉘어 있어 브라우저가 화면에 쓰인 글자의 청크만 받는다.
+ */
+export const PRETENDARD_CSS_HREF = '/fonts/pretendard/pretendard.css';
 
 /** 로고 전용 — weight 를 생략해 가변 폰트 한 벌만 받는다. */
 export const baloo2 = Baloo_2({

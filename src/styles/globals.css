@@ -23,8 +23,8 @@
   --color-gold-soft: #fff6dc;
 
   /* 폰트 */
-  --font-sans: var(--font-noto-sans-kr), sans-serif;
-  --font-serif: var(--font-gowun-batang), serif;
+  --font-sans: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-title: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-logo: var(--font-baloo-2), 'Trebuchet MS', sans-serif;
 }
 

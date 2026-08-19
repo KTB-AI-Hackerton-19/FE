@@ -9,6 +9,8 @@ export const API = {
   LOGOUT: '/api/auth/logout',
   REFRESH: '/api/auth/refresh',
 
+  USERS_ME: '/api/users/me',
+
   DASHBOARD: '/api/dashboard',
   CATEGORIES: '/api/categories',
   CATEGORY: (id: number) => `/api/categories/${id}`,
@@ -30,6 +32,7 @@ export const API = {
 } as const;
 
 export const QUERY_KEY = {
+  ME: ['me'],
   DASHBOARD: ['dashboard'],
   CATEGORIES: ['categories'],
   GIFT_RECORDS: ['gift-records'],

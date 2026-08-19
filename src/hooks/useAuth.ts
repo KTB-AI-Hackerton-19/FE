@@ -25,12 +25,18 @@ const subscribe = (onChange: () => void) => {
   };
 };
 
-/** 로그인 여부. 서버 렌더 중에는 항상 false 라서 화면 보호는 클라이언트에서 이뤄진다. */
+/**
+ * 로그인 여부. `null` 은 "아직 모름" 이다.
+ *
+ * 토큰이 localStorage 에 있어 서버 렌더 중에는 알 수 없고, React 는 하이드레이션 때도
+ * 서버 스냅샷을 쓴다. 이때 `false` 를 돌려주면 토큰이 있는데도 "로그아웃" 으로 읽혀
+ * 새로고침마다 로그인 화면으로 튕긴다. 그래서 모르는 상태를 따로 표현한다.
+ */
 export const useIsLoggedIn = () =>
-  useSyncExternalStore(
+  useSyncExternalStore<boolean | null>(
     subscribe,
     () => getAccessToken() !== null,
-    () => false
+    () => null
   );
 
 export const usePostLogin = () => {

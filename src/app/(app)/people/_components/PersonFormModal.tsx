@@ -7,7 +7,8 @@ import Button from '@/components/common/button';
 import Modal from '@/components/common/modal';
 import { useAppUi } from '@/hooks/useAppUi';
 import { usePatchPerson, usePostPerson } from '@/hooks/usePeopleMutations';
-import type { PersonT } from '@/types/person';
+import { GENDER_OPTIONS } from '@/types/person';
+import type { GenderT, PersonT } from '@/types/person';
 
 const fieldClass =
   'rounded-[10px] border border-line bg-white p-2.5 text-[12px] outline-0 focus:border-[#da897a] focus:shadow-[0_0_0_3px_#ed7b6912]';
@@ -27,6 +28,7 @@ function PersonFormModal({ person, onClose }: PersonFormModalProps) {
 
   const [name, setName] = useState(person?.name ?? '');
   const [relation, setRelation] = useState(person?.relation ?? '');
+  const [gender, setGender] = useState<GenderT | null>(person?.gender ?? null);
   const [birthday, setBirthday] = useState(person?.birthday ?? '');
   const [memo, setMemo] = useState(person?.memo ?? '');
 
@@ -44,6 +46,7 @@ function PersonFormModal({ person, onClose }: PersonFormModalProps) {
     const body = {
       name: name.trim(),
       relation: relation.trim() || undefined,
+      gender: gender ?? undefined,
       birthday: birthday || undefined,
       memo: memo.trim() || undefined,
     };
@@ -63,9 +66,11 @@ function PersonFormModal({ person, onClose }: PersonFormModalProps) {
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="mb-1.5 font-serif text-[21px]">{isEdit ? '정보 수정' : '사람 등록'}</h2>
+      <h2 className="mb-1.5 font-title font-bold text-[21px]">
+        {isEdit ? '정보 수정' : '사람 등록'}
+      </h2>
       <p className="mb-5 text-[11px] leading-[1.7] text-[#8e8880]">
-        생일을 넣어두면 홈 화면 에이전트 카드와 선물 추천에 반영돼요.
+        생일과 성별을 넣어두면 홈 화면 에이전트 카드와 선물 추천에 반영돼요.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -88,6 +93,27 @@ function PersonFormModal({ person, onClose }: PersonFormModalProps) {
             className={fieldClass}
           />
         </label>
+
+        <div className={labelClass}>
+          <span className={labelTextClass}>성별</span>
+          <div className="flex gap-1.5">
+            {GENDER_OPTIONS.map(option => (
+              <button
+                key={option}
+                type="button"
+                // 선택 항목이라 같은 값을 다시 누르면 해제된다.
+                onClick={() => setGender(current => (current === option ? null : option))}
+                className={`flex-1 cursor-pointer rounded-[10px] border py-2.5 text-[11px] transition ${
+                  gender === option
+                    ? 'border-forest bg-forest text-white'
+                    : 'border-line bg-white text-[#7c7770] hover:border-[#d7c7bc]'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <label className={labelClass}>
           <span className={labelTextClass}>생일</span>

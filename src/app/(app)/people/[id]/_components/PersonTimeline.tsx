@@ -79,10 +79,12 @@ function PersonTimeline({ id }: PersonTimelineProps) {
       {personData ? (
         <>
           <div className="rounded-[20px] border border-line bg-white p-[26px] text-center">
-            <div className="mx-auto grid size-16 place-items-center rounded-[22px] bg-[#f3e1db] font-serif text-[26px] text-[#b65f51]">
+            <div className="mx-auto grid size-16 place-items-center rounded-[22px] bg-[#f3e1db] font-title font-bold text-[26px] text-[#b65f51]">
               {personData.person.name[0]}
             </div>
-            <h1 className="mt-2.5 mb-[3px] font-serif text-2xl">{personData.person.name}</h1>
+            <h1 className="mt-2.5 mb-[3px] font-title font-bold text-2xl">
+              {personData.person.name}
+            </h1>
             <p className="text-[11px] text-[#918b83]">
               {personData.person.relation} · 함께한 마음 {personData.person.giftCount}개
             </p>
@@ -100,7 +102,7 @@ function PersonTimeline({ id }: PersonTimelineProps) {
           </div>
 
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-[19px]">주고받은 마음</h2>
+            <h2 className="font-title font-bold text-[19px]">주고받은 마음</h2>
             <span className="text-[10px] text-muted">{personData.records.length}개</span>
           </div>
 

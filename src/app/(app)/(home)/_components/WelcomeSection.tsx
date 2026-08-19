@@ -12,7 +12,7 @@ function WelcomeSection() {
         <span className="text-xs font-semibold tracking-[0.03em] text-[#96918a]">
           {dashboardData ? formatFullKoreanDate(dashboardData.today) : ' '}
         </span>
-        <h1 className="mt-[9px] font-serif text-[29px] leading-[1.42] tracking-[-0.04em] lg:text-[34px]">
+        <h1 className="mt-[9px] font-title font-bold text-[29px] leading-[1.42] tracking-[-0.04em] lg:text-[34px]">
           오늘도 소중한 마음을
           <br />
           <em className="text-coral-deep not-italic">잊지 않게 챙겨드릴게요.</em>

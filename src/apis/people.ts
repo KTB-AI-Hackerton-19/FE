@@ -1,11 +1,13 @@
 import { API } from '@/consts/api';
-import type { PersonT } from '@/types/person';
+import type { GenderT, PersonT } from '@/types/person';
 
 import { apiClient } from './apiClient';
 
 export type PostPersonRequestT = {
   name: string;
   relation?: string;
+  /** 선택 항목 — 선물 추천의 참고 정보로 쓰인다 */
+  gender?: GenderT;
   birthday?: string;
   memo?: string;
 };

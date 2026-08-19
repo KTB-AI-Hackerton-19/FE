@@ -23,7 +23,9 @@ function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
       <div className="mx-auto grid size-12 place-items-center rounded-[15px] bg-coral-soft text-coral-deep">
         <ImagePlus />
       </div>
-      <h2 className="mt-3.5 mb-1.5 text-center font-serif text-[23px]">어떤 마음을 받으셨나요?</h2>
+      <h2 className="mt-3.5 mb-1.5 text-center font-title font-bold text-[23px]">
+        어떤 마음을 받으셨나요?
+      </h2>
       <p className="mb-[19px] text-center text-[11px] leading-[1.7] text-[#8e8880]">
         메시지 캡처나 선물 사진을 올리면
         <br />
