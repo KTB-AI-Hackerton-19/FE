@@ -7,10 +7,12 @@ type ModalProps = {
   children: React.ReactNode;
   /** 패널 최대 너비 (기본 480px) */
   size?: 'sm' | 'md';
+  /** 닫기 버튼이 따로 있는 경우(확인 다이얼로그 등) 우상단 X 를 숨긴다. */
+  hideClose?: boolean;
 };
 
 /** 모바일에서는 바텀시트, 데스크톱에서는 가운데 팝업으로 뜬다. */
-function Modal({ onClose, children, size = 'md' }: ModalProps) {
+function Modal({ onClose, children, size = 'md', hideClose = false }: ModalProps) {
   return (
     <div
       className="fixed inset-0 z-30 grid place-items-end bg-[#211c19]/50 backdrop-blur-[5px] sm:place-items-center sm:p-5"
@@ -21,14 +23,16 @@ function Modal({ onClose, children, size = 'md' }: ModalProps) {
           size === 'sm' ? 'sm:max-w-[400px]' : 'sm:max-w-[480px]'
         }`}
       >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="닫기"
-          className="absolute top-[18px] right-[18px] grid size-8 cursor-pointer place-items-center rounded-full bg-[#f2efeb] text-[#77716a]"
-        >
-          <X size={17} />
-        </button>
+        {hideClose ? null : (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="닫기"
+            className="absolute top-[18px] right-[18px] grid size-8 cursor-pointer place-items-center rounded-full bg-[#f2efeb] text-[#77716a]"
+          >
+            <X size={17} />
+          </button>
+        )}
         {children}
       </div>
     </div>
