@@ -7,7 +7,9 @@ import { useState } from 'react';
 import { ApiError } from '@/apis/apiClient';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import LogoutConfirmDialog from '@/components/common/logout-confirm-dialog';
+import SadGiftIcon from '@/components/common/sad-gift-icon';
 import { useAppUi } from '@/hooks/useAppUi';
+import { useGetMe } from '@/hooks/useGetMe';
 import { useLogoutFlow } from '@/hooks/useLogoutFlow';
 import { useDeleteMe } from '@/hooks/useUserMutations';
 import { clearTokens, notifyAuthChanged } from '@/utils/tokenStorage';
@@ -18,6 +20,7 @@ const rowClass =
 function AccountActions() {
   const router = useRouter();
   const { showToast } = useAppUi();
+  const { meData } = useGetMe();
   const { deleteMeMutation, isDeleteMePending } = useDeleteMe();
 
   const { isConfirmOpen, isLoggingOut, openLogoutConfirm, closeLogoutConfirm, confirmLogout } =
@@ -40,8 +43,6 @@ function AccountActions() {
 
   return (
     <>
-      <h2 className="mt-8 mb-3 font-serif text-[19px]">계정</h2>
-
       <section className="overflow-hidden rounded-[17px] border border-line bg-white">
         <button type="button" onClick={openLogoutConfirm} className={rowClass}>
           <LogOut size={16} className="text-[#8e8880]" />
@@ -55,7 +56,7 @@ function AccountActions() {
           className={`${rowClass} text-coral-dark`}
         >
           <UserMinus size={16} />
-          <span className="flex-1 text-left">회원 탈퇴</span>
+          <span className="flex-1 text-left">탈퇴하기</span>
           <ChevronRight size={17} className="text-[#b1aba3]" />
         </button>
       </section>
@@ -70,17 +71,11 @@ function AccountActions() {
 
       {isWithdrawOpen ? (
         <ConfirmDialog
-          title="정말 탈퇴하시겠어요?"
-          description={
-            <>
-              기록한 마음과 사람, 카테고리가 <b className="text-ink">모두 사라져요.</b>
-              <br />
-              되돌릴 수 없어요.
-            </>
-          }
-          icon={<UserMinus size={22} />}
-          confirmLabel="탈퇴할래요"
-          cancelLabel="유지할래요"
+          title={`${meData?.name ?? '사용자'}님, Giftie를 떠나시나요?`}
+          description="지금까지의 마음 기록이 모두 사라져요."
+          icon={<SadGiftIcon />}
+          confirmLabel="탈퇴하기"
+          cancelLabel="더 써볼래요"
           isPending={isDeleteMePending}
           onConfirm={handleWithdraw}
           onCancel={() => setIsWithdrawOpen(false)}
