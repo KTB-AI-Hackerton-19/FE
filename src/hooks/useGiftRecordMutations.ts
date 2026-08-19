@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
+  deleteGiftRecord,
   patchGiftRecord,
   patchGiftRecordThanked,
   postGiftRecord,
@@ -72,4 +73,15 @@ export const usePostGiftRecordExtract = () => {
     });
 
   return { postGiftRecordExtractMutation, isPostGiftRecordExtractPending };
+};
+
+export const useDeleteGiftRecord = () => {
+  const invalidate = useInvalidateRecords();
+
+  const { mutate: deleteGiftRecordMutation, isPending: isDeleteGiftRecordPending } = useMutation({
+    mutationFn: deleteGiftRecord,
+    onSuccess: invalidate,
+  });
+
+  return { deleteGiftRecordMutation, isDeleteGiftRecordPending };
 };

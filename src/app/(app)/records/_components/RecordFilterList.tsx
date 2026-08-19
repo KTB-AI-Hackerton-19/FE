@@ -1,22 +1,32 @@
 'use client';
 
-import { ChevronRight, Plus } from 'lucide-react';
+import { ChevronRight, Plus, Settings2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { ApiError } from '@/apis/apiClient';
+import ConfirmDialog from '@/components/common/confirm-dialog';
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
 import ThankedBadge from '@/components/common/thanked-badge';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import { useGetGiftRecords } from '@/hooks/useGetGiftRecords';
+import { useDeleteGiftRecord } from '@/hooks/useGiftRecordMutations';
+import type { GiftRecordT } from '@/types/record';
 import { formatDate } from '@/utils/formatDate';
+
+import CategoryManagerModal from './CategoryManagerModal';
 
 const ALL = '전체';
 
 function RecordFilterList() {
   const [category, setCategory] = useState(ALL);
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<GiftRecordT | null>(null);
+
   const { categoriesData } = useGetCategories();
-  const { openRecordModal } = useAppUi();
+  const { openRecordModal, showToast } = useAppUi();
+  const { deleteGiftRecordMutation, isDeleteGiftRecordPending } = useDeleteGiftRecord();
 
   // 필터링은 서버에서 처리한다 — 전체를 받아 클라이언트에서 거르지 않는다.
   const { giftRecordsData, isGetGiftRecordsPending } = useGetGiftRecords({
@@ -31,9 +41,24 @@ function RecordFilterList() {
     ...categoriesData.filter(item => item.recordCount > 0).map(item => item.name),
   ];
 
+  const handleDelete = () => {
+    if (!pendingDelete) return;
+
+    deleteGiftRecordMutation(pendingDelete.id, {
+      onSuccess: () => {
+        showToast('기록을 삭제했어요');
+        setPendingDelete(null);
+      },
+      onError: error => {
+        showToast(error instanceof ApiError ? error.message : '삭제하지 못했어요');
+        setPendingDelete(null);
+      },
+    });
+  };
+
   return (
     <>
-      <div className="flex gap-2 overflow-auto pb-[5px]">
+      <div className="flex items-center gap-2 overflow-auto pb-[5px]">
         {chips.map(name => (
           <button
             key={name}
@@ -48,6 +73,13 @@ function RecordFilterList() {
             {name}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setIsCategoryManagerOpen(true)}
+          className="flex shrink-0 cursor-pointer items-center gap-1 rounded-[20px] border border-dashed border-[#d7c7bc] bg-white px-3 py-2 text-[10px] whitespace-nowrap text-[#a5988f] hover:text-ink"
+        >
+          <Settings2 size={13} /> 카테고리
+        </button>
       </div>
 
       <div className="my-[25px] mb-[11px] flex justify-between text-[11px]">
@@ -66,7 +98,7 @@ function RecordFilterList() {
               key={record.id}
               className="relative flex w-full items-center gap-2.5 border-b border-line px-[11px] py-[13px] transition last:border-b-0 hover:bg-[#fdfaf7] sm:gap-3.5 sm:p-4"
             >
-              {/* 행 전체를 덮는 링크. 뱃지 버튼은 위에 떠 있어 클릭이 겹치지 않는다. */}
+              {/* 행 전체를 덮는 링크. 위의 버튼들은 그보다 앞에 떠 있어 클릭이 겹치지 않는다. */}
               <Link
                 href={record.personId ? `/people/${record.personId}` : '/records'}
                 aria-label={`${record.person}님 상세 보기`}
@@ -93,13 +125,23 @@ function RecordFilterList() {
                 </div>
               </div>
 
-              <div className="relative grid grid-cols-[auto_20px] items-center gap-x-2.5 gap-y-[3px] text-right">
-                <b className="max-w-[88px] truncate text-[11px]">{record.price}</b>
-                <ChevronRight
-                  size={18}
-                  className="col-start-2 row-span-2 row-start-1 text-[#b1aba3]"
-                />
-                <span className="col-start-1 text-[9px] text-subtle">{record.category}</span>
+              <div className="relative flex items-center gap-1.5">
+                <div className="text-right">
+                  <b className="block max-w-[88px] truncate text-[11px]">{record.price}</b>
+                  <span className="text-[9px] text-subtle">{record.category}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={event => {
+                    event.preventDefault();
+                    setPendingDelete(record);
+                  }}
+                  aria-label={`${record.gift} 기록 삭제`}
+                  className="cursor-pointer rounded-lg p-1.5 text-[#c3bcb4] transition hover:bg-coral-soft hover:text-coral-dark"
+                >
+                  <Trash2 size={15} />
+                </button>
+                <ChevronRight size={18} className="text-[#b1aba3]" />
               </div>
             </div>
           ))}
@@ -113,6 +155,28 @@ function RecordFilterList() {
       >
         <Plus size={17} /> 마음 기록하기
       </button>
+
+      {isCategoryManagerOpen ? (
+        <CategoryManagerModal onClose={() => setIsCategoryManagerOpen(false)} />
+      ) : null}
+
+      {pendingDelete ? (
+        <ConfirmDialog
+          title="이 기록을 삭제할까요?"
+          description={
+            <>
+              <b className="text-ink">
+                {pendingDelete.person}님의 {pendingDelete.gift}
+              </b>
+              <br />
+              연결된 답례 알림도 함께 사라져요.
+            </>
+          }
+          isPending={isDeleteGiftRecordPending}
+          onConfirm={handleDelete}
+          onCancel={() => setPendingDelete(null)}
+        />
+      ) : null}
     </>
   );
 }

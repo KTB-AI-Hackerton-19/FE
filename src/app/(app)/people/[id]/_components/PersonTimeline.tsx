@@ -1,9 +1,16 @@
 'use client';
 
-import { Bell, ChevronLeft } from 'lucide-react';
+import { Bell, ChevronLeft, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
+import { ApiError } from '@/apis/apiClient';
+import PersonFormModal from '@/app/(app)/people/_components/PersonFormModal';
+import ConfirmDialog from '@/components/common/confirm-dialog';
+import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPerson } from '@/hooks/useGetPeople';
+import { useDeletePeople } from '@/hooks/usePeopleMutations';
 import { formatDate, formatShortDate } from '@/utils/formatDate';
 
 type PersonTimelineProps = {
@@ -12,15 +19,56 @@ type PersonTimelineProps = {
 
 function PersonTimeline({ id }: PersonTimelineProps) {
   const { personData, isGetPersonPending, getPersonError } = useGetPerson(id);
+  const { deletePeopleMutation, isDeletePeoplePending } = useDeletePeople();
+  const { showToast } = useAppUi();
+  const router = useRouter();
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleDelete = () =>
+    deletePeopleMutation([id], {
+      onSuccess: () => {
+        showToast(`${personData?.person.name}님을 삭제했어요`);
+        router.replace('/people');
+      },
+      onError: error => {
+        showToast(error instanceof ApiError ? error.message : '삭제하지 못했어요');
+        setIsConfirmOpen(false);
+      },
+    });
 
   return (
     <>
-      <Link
-        href="/people"
-        className="mb-[18px] flex items-center text-[11px] text-[#777169] hover:text-ink"
-      >
-        <ChevronLeft size={18} /> 사람 목록
-      </Link>
+      <div className="mb-[18px] flex items-center justify-between">
+        <Link
+          href="/people"
+          className="flex items-center text-[11px] text-[#777169] hover:text-ink"
+        >
+          <ChevronLeft size={18} /> 사람 목록
+        </Link>
+
+        {personData ? (
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={() => setIsEditOpen(true)}
+              aria-label="정보 수정"
+              className="cursor-pointer rounded-lg p-2 text-subtle transition hover:bg-white hover:text-ink"
+            >
+              <Pencil size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsConfirmOpen(true)}
+              aria-label="사람 삭제"
+              className="cursor-pointer rounded-lg p-2 text-subtle transition hover:bg-coral-soft hover:text-coral-dark"
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        ) : null}
+      </div>
 
       {getPersonError ? (
         <div className="rounded-[14px] border border-dashed border-[#d8d2ca] bg-white p-[26px] text-center text-[11px] text-muted">
@@ -87,6 +135,31 @@ function PersonTimeline({ id }: PersonTimelineProps) {
       ) : null}
 
       {isGetPersonPending ? <p className="text-[11px] text-muted">불러오는 중이에요…</p> : null}
+
+      {isEditOpen && personData ? (
+        <PersonFormModal person={personData.person} onClose={() => setIsEditOpen(false)} />
+      ) : null}
+
+      {isConfirmOpen && personData ? (
+        <ConfirmDialog
+          title={`${personData.person.name}님을 삭제할까요?`}
+          description={
+            personData.person.giftCount > 0 ? (
+              <>
+                {personData.person.name}님과 주고받은 마음 기록{' '}
+                <b className="text-ink">{personData.person.giftCount}개</b>도 함께 사라져요.
+                <br />
+                되돌릴 수 없어요.
+              </>
+            ) : (
+              '되돌릴 수 없어요.'
+            )
+          }
+          isPending={isDeletePeoplePending}
+          onConfirm={handleDelete}
+          onCancel={() => setIsConfirmOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

@@ -11,6 +11,7 @@ export const API = {
 
   DASHBOARD: '/api/dashboard',
   CATEGORIES: '/api/categories',
+  CATEGORY: (id: number) => `/api/categories/${id}`,
 
   GIFT_RECORDS: '/api/gift-records',
   GIFT_RECORD: (id: number) => `/api/gift-records/${id}`,

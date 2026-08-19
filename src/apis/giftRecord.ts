@@ -43,3 +43,6 @@ export type PostGiftRecordExtractResponseT = GiftRecordT;
 /** 업로드된 이미지를 AI가 분석해 DRAFT 기록을 만든다. */
 export const postGiftRecordExtract = (body: PostGiftRecordExtractRequestT) =>
   apiClient.post<PostGiftRecordExtractResponseT>(API.GIFT_RECORD_EXTRACT, body);
+
+/** 기록과 연결된 답례 알림을 함께 삭제한다. */
+export const deleteGiftRecord = (id: number) => apiClient.delete<void>(API.GIFT_RECORD(id));
