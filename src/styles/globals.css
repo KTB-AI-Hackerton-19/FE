@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@theme {
+  /* 브랜드 */
+  --color-coral: #ed7b69;
+  --color-coral-dark: #dc6e5d;
+  --color-coral-deep: #df705f;
+  --color-coral-soft: #fff0eb;
+  --color-forest: #344f45;
+  --color-green: #6b8f7d;
+
+  /* 중립 */
+  --color-ink: #292724;
+  --color-muted: #837f78;
+  --color-subtle: #a09b94;
+  --color-line: #e9e5de;
+  --color-cream: #f8f7f3;
+
+  /* 카테고리 배경 */
+  --color-mint-soft: #edf5f0;
+  --color-pink-soft: #fff0f0;
+  --color-blue-soft: #eef3fa;
+  --color-gold-soft: #fff6dc;
+
+  /* 폰트 */
+  --font-sans: var(--font-noto-sans-kr), sans-serif;
+  --font-serif: var(--font-gowun-batang), serif;
+  --font-logo: var(--font-baloo-2), 'Trebuchet MS', sans-serif;
+}
+
+@layer base {
+  html {
+    color: var(--color-ink);
+    background: var(--color-cream);
+    font-synthesis: none;
+  }
+
+  body {
+    min-width: 320px;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  /* 앱뷰처럼 보이도록 스크롤바를 숨긴다. 스크롤 동작 자체는 유지된다. */
+  * {
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}

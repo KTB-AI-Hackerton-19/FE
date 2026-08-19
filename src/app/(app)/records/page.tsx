@@ -1,0 +1,25 @@
+import type { Metadata } from 'next';
+
+import PageContainer from '@/components/common/page-container';
+import PageHeader from '@/components/common/page-header';
+
+import RecordFilterList from './_components/RecordFilterList';
+import RecordsHeaderAction from './_components/RecordsHeaderAction';
+
+export const metadata: Metadata = {
+  title: '마음 기록 — Giftie',
+};
+
+export default function RecordsPage() {
+  return (
+    <PageContainer subpage>
+      <PageHeader
+        eyebrow="마음 기록"
+        title="받은 마음을 모아봤어요"
+        description="선물과 부조금을 잊지 않도록 차곡차곡 기록해요."
+        action={<RecordsHeaderAction />}
+      />
+      <RecordFilterList />
+    </PageContainer>
+  );
+}
