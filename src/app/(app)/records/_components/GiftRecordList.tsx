@@ -3,11 +3,11 @@
 import { Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
+import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import { useGetInfiniteGiftRecords } from '@/hooks/useGetInfiniteGiftRecords';
 
 import CategoryManagerModal from './CategoryManagerModal';
-import InfiniteScrollSentinel from './InfiniteScrollSentinel';
 import RecordRows from './RecordRows';
 import SortToggle from './SortToggle';
 import type { SortKeyT } from './SortToggle';

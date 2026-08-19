@@ -3,6 +3,7 @@
 import { PieChart, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
+import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGetAllGiftRecords } from '@/hooks/useGetAllGiftRecords';
@@ -13,7 +14,6 @@ import { formatAmount } from '@/utils/formatAmount';
 import { formatDate } from '@/utils/formatDate';
 
 import EventAmountChart from './EventAmountChart';
-import InfiniteScrollSentinel from './InfiniteScrollSentinel';
 import RecordRows from './RecordRows';
 import SortToggle from './SortToggle';
 import type { SortKeyT } from './SortToggle';
