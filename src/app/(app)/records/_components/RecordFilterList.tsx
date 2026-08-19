@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
+import ThankedBadge from '@/components/common/thanked-badge';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import { useGetGiftRecords } from '@/hooks/useGetGiftRecords';
@@ -61,16 +62,24 @@ function RecordFilterList() {
       ) : (
         <div className="overflow-hidden rounded-[17px] border border-line bg-white">
           {records.map(record => (
-            <Link
+            <div
               key={record.id}
-              href={record.personId ? `/people/${record.personId}` : '/records'}
-              className="flex w-full items-center gap-2.5 border-b border-line px-[11px] py-[13px] text-left last:border-b-0 hover:bg-[#fdfaf7] sm:gap-3.5 sm:p-4"
+              className="relative flex w-full items-center gap-2.5 border-b border-line px-[11px] py-[13px] transition last:border-b-0 hover:bg-[#fdfaf7] sm:gap-3.5 sm:p-4"
             >
-              <div className={recordEmojiStyles({ accent: record.color, size: 'sm' })}>
+              {/* 행 전체를 덮는 링크. 뱃지 버튼은 위에 떠 있어 클릭이 겹치지 않는다. */}
+              <Link
+                href={record.personId ? `/people/${record.personId}` : '/records'}
+                aria-label={`${record.person}님 상세 보기`}
+                className="absolute inset-0"
+              />
+
+              <div
+                className={`relative ${recordEmojiStyles({ accent: record.color, size: 'sm' })}`}
+              >
                 {record.emoji}
               </div>
 
-              <div className="min-w-0 flex-1">
+              <div className="relative min-w-0 flex-1">
                 <span className="text-[9px] text-subtle">{formatDate(record.date)}</span>
                 <h3 className="my-[3px] text-sm">
                   {record.person}
@@ -79,9 +88,12 @@ function RecordFilterList() {
                   </small>
                 </h3>
                 <p className="text-[11px] text-[#716b64]">{record.gift}</p>
+                <div className="-ml-1.5">
+                  <ThankedBadge id={record.id} thanked={record.thanked} stopPropagation />
+                </div>
               </div>
 
-              <div className="grid grid-cols-[auto_20px] items-center gap-x-2.5 gap-y-[3px] text-right">
+              <div className="relative grid grid-cols-[auto_20px] items-center gap-x-2.5 gap-y-[3px] text-right">
                 <b className="max-w-[88px] truncate text-[11px]">{record.price}</b>
                 <ChevronRight
                   size={18}
@@ -89,7 +101,7 @@ function RecordFilterList() {
                 />
                 <span className="col-start-1 text-[9px] text-subtle">{record.category}</span>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

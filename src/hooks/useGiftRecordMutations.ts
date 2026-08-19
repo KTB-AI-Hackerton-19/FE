@@ -2,7 +2,12 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { patchGiftRecord, postGiftRecord, postGiftRecordExtract } from '@/apis/giftRecord';
+import {
+  patchGiftRecord,
+  patchGiftRecordThanked,
+  postGiftRecord,
+  postGiftRecordExtract,
+} from '@/apis/giftRecord';
 import { uploadGiftImage } from '@/apis/uploadImage';
 import { QUERY_KEY } from '@/consts/api';
 
@@ -42,6 +47,18 @@ export const usePatchGiftRecord = () => {
   });
 
   return { patchGiftRecordMutation, isPatchGiftRecordPending };
+};
+
+export const usePatchGiftRecordThanked = () => {
+  const invalidate = useInvalidateRecords();
+
+  const { mutate: patchGiftRecordThankedMutation, isPending: isPatchGiftRecordThankedPending } =
+    useMutation({
+      mutationFn: patchGiftRecordThanked,
+      onSuccess: invalidate,
+    });
+
+  return { patchGiftRecordThankedMutation, isPatchGiftRecordThankedPending };
 };
 
 /** 이미지 업로드(S3 직접 PUT) → AI 분석 → DRAFT 기록 생성까지 한 흐름으로 묶는다. */

@@ -3,6 +3,7 @@
 import { Bell, Heart, Plus } from 'lucide-react';
 
 import Button from '@/components/common/button';
+import SearchBar from '@/components/common/search-bar';
 import { useAppUi } from '@/hooks/useAppUi';
 
 function Topbar() {
@@ -14,7 +15,9 @@ function Topbar() {
         <Heart size={17} fill="currentColor" /> Giftie
       </div>
 
-      <div className="flex items-center gap-3 lg:ml-auto">
+      <SearchBar />
+
+      <div className="flex items-center gap-3">
         {/* 알림은 아직 API를 붙이지 않았다 — UI만 유지한다. */}
         <button
           type="button"

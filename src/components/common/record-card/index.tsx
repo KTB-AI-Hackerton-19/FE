@@ -1,5 +1,6 @@
-import { Check, CircleUserRound, Clock3 } from 'lucide-react';
+import { CircleUserRound } from 'lucide-react';
 
+import ThankedBadge from '@/components/common/thanked-badge';
 import type { GiftRecordT } from '@/types/record';
 import { formatDate } from '@/utils/formatDate';
 
@@ -31,20 +32,8 @@ function RecordCard({ record }: RecordCardProps) {
         ) : null}
       </div>
 
-      <div
-        className={`absolute right-3.5 bottom-3.5 flex items-center gap-[3px] text-[9px] ${
-          record.thanked ? 'text-[#6b917b]' : 'text-[#b27b48]'
-        }`}
-      >
-        {record.thanked ? (
-          <>
-            <Check size={14} /> 감사 완료
-          </>
-        ) : (
-          <>
-            <Clock3 size={14} /> 확인 필요
-          </>
-        )}
+      <div className="absolute right-2.5 bottom-2.5">
+        <ThankedBadge id={record.id} thanked={record.thanked} />
       </div>
     </article>
   );

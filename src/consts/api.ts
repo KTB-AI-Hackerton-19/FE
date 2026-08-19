@@ -14,6 +14,7 @@ export const API = {
 
   GIFT_RECORDS: '/api/gift-records',
   GIFT_RECORD: (id: number) => `/api/gift-records/${id}`,
+  GIFT_RECORD_THANKED: (id: number) => `/api/gift-records/${id}/thanked`,
   GIFT_RECORD_EXTRACT: '/api/gift-records/extract',
   PRESIGNED_URL: '/api/gift-assets/presigned-url',
 
@@ -35,4 +36,5 @@ export const QUERY_KEY = {
   PERSON: (id: number) => ['people', id],
   CALENDAR: (year: number, month: number) => ['calendar', year, month],
   RECOMMENDATIONS: ['recommendations'],
+  SEARCH: (q: string) => ['search', q],
 } as const;

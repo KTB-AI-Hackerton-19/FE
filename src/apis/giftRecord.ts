@@ -31,6 +31,12 @@ export type PatchGiftRecordResponseT = GiftRecordT;
 export const patchGiftRecord = ({ id, ...body }: PatchGiftRecordRequestT & { id: number }) =>
   apiClient.patch<PatchGiftRecordResponseT>(API.GIFT_RECORD(id), body);
 
+export type PatchGiftRecordThankedRequestT = { id: number; thanked: boolean };
+
+/** '감사 완료' / '확인 필요' 뱃지 토글 */
+export const patchGiftRecordThanked = ({ id, thanked }: PatchGiftRecordThankedRequestT) =>
+  apiClient.patch<GiftRecordT>(API.GIFT_RECORD_THANKED(id), { thanked });
+
 export type PostGiftRecordExtractRequestT = { imageKey: string };
 export type PostGiftRecordExtractResponseT = GiftRecordT;
 
