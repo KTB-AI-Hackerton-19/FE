@@ -7,7 +7,7 @@ import RecordFilterList from './_components/RecordFilterList';
 import RecordsHeaderAction from './_components/RecordsHeaderAction';
 
 export const metadata: Metadata = {
-  title: '마음 기록 — 마음장부',
+  title: '마음 기록 — Giftie',
 };
 
 export default function RecordsPage() {

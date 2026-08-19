@@ -6,7 +6,7 @@ import PageHeader from '@/components/common/page-header';
 import CalendarView from './_components/CalendarView';
 
 export const metadata: Metadata = {
-  title: '마음 캘린더 — 마음장부',
+  title: '마음 캘린더 — Giftie',
 };
 
 export default function CalendarPage() {
