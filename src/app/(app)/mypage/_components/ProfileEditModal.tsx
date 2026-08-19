@@ -81,16 +81,13 @@ function ProfileEditModal({ user, onClose }: ProfileEditModalProps) {
   };
 
   return (
-    <Modal onClose={handleClose} size="sm">
-      <h2 className="mb-1.5 font-serif text-[21px]">프로필 수정</h2>
-      <p className="mb-5 text-[11px] leading-[1.7] text-[#8e8880]">
-        아이디(@{user.username})는 바꿀 수 없어요.
-      </p>
+    <Modal onClose={handleClose} size="sm" hideClose>
+      <h2 className="mb-5 font-serif text-[21px]">프로필 수정</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col items-center gap-2.5">
           <label className="relative cursor-pointer">
-            <ProfileAvatar name={trimmedName || user.name} imageUrl={previewUrl} size="lg" />
+            <ProfileAvatar name={trimmedName || user.name} imageUrl={previewUrl} size="xl" />
             <span className="absolute right-0 bottom-0 grid size-7 place-items-center rounded-full border-2 border-white bg-coral text-white">
               <Camera size={14} />
             </span>
@@ -132,7 +129,7 @@ function ProfileEditModal({ user, onClose }: ProfileEditModalProps) {
             취소
           </Button>
           <Button type="submit" full disabled={isPatchMePending || !trimmedName}>
-            {isPatchMePending ? '저장 중…' : '저장하기'}
+            {isPatchMePending ? '수정 중…' : '수정하기'}
           </Button>
         </div>
       </form>
