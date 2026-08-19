@@ -1,7 +1,7 @@
 type PageHeaderProps = {
   eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
   action?: React.ReactNode;
 };
 
@@ -13,7 +13,7 @@ function PageHeader({ eyebrow, title, description, action }: PageHeaderProps) {
         <h1 className="mt-[7px] mb-[5px] font-serif text-[27px] tracking-[-0.04em] lg:text-[30px]">
           {title}
         </h1>
-        <p className="text-[11px] text-[#918b83]">{description}</p>
+        {description ? <p className="text-[11px] text-[#918b83]">{description}</p> : null}
       </div>
       {action}
     </div>

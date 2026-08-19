@@ -5,12 +5,17 @@ import { CalendarDays, Heart, Users } from 'lucide-react';
 import StatCard from '@/components/common/stat-card';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 
-function StatsGrid() {
+type StatsGridProps = {
+  /** 바깥 여백은 쓰는 쪽에서 정한다 */
+  className?: string;
+};
+
+function StatsGrid({ className = '' }: StatsGridProps) {
   const { dashboardData } = useGetDashboard();
   const stats = dashboardData?.stats;
 
   return (
-    <section className="my-[15px] grid grid-cols-3 gap-1.5 sm:gap-[15px] lg:mb-6">
+    <section className={`grid grid-cols-3 gap-1.5 sm:gap-[15px] ${className}`}>
       <StatCard
         icon={Heart}
         label="기록한 마음"

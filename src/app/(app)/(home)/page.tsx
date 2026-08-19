@@ -10,7 +10,7 @@ export default function HomePage() {
   return (
     <PageContainer>
       <WelcomeSection />
-      <StatsGrid />
+      <StatsGrid className="my-[15px] lg:mb-6" />
       <AgentCard />
       <RecentRecords />
       <RecommendSection />
