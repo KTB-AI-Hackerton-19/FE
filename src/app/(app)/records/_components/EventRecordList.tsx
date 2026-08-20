@@ -167,7 +167,7 @@ function EventRecordList() {
           /* 칩이 늘어도 줄바꿈으로 높이가 변하지 않도록 가로로 흘린다. */
           <div className="flex min-w-0 items-center gap-2 overflow-x-auto">
             <b className="flex shrink-0 items-center gap-1.5">
-              <Gift size={13} className="shrink-0 text-subtle" />
+              <Gift size={15} className="shrink-0" />
               {bucketRecords ? bucketRecords.length : giftRecordsTotal}개의 마음
             </b>
             {bucketLabels.map(label => (

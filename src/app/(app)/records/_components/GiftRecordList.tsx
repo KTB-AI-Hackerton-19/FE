@@ -93,7 +93,7 @@ function GiftRecordList() {
         onCancel={selection.cancel}
         leading={
           <b className="flex min-w-0 items-center gap-1.5 truncate">
-            <Gift size={13} className="shrink-0 text-subtle" />
+            <Gift size={15} className="shrink-0" />
             {giftRecordsTotal}개의 마음
           </b>
         }
