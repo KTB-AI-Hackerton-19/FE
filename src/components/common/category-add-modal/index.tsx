@@ -82,7 +82,7 @@ function CategoryAddModal({
   };
 
   return (
-    <Modal onClose={onClose} size="sm" hideClose noScroll>
+    <Modal onClose={onClose} size="sm" hideClose>
       <h2 className="mb-5 font-title font-bold text-[19px]">{title}</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">

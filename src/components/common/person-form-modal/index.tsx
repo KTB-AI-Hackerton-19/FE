@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
+import DatePicker from '@/components/common/date-picker';
 import Modal from '@/components/common/modal';
 import RelationPicker from '@/components/common/relation-picker';
 import { useAppUi } from '@/hooks/useAppUi';
@@ -121,15 +122,16 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
           </div>
         </div>
 
-        <label className={labelClass}>
+        <div className={labelClass}>
           <span className={labelTextClass}>생일</span>
-          <input
-            type="date"
+          <DatePicker
             value={birthday}
-            onChange={event => setBirthday(event.target.value)}
+            onChange={setBirthday}
+            placeholder="선택 안 함"
+            clearable
             className={fieldClass}
           />
-        </label>
+        </div>
 
         <label className={labelClass}>
           <span className={labelTextClass}>메모</span>
