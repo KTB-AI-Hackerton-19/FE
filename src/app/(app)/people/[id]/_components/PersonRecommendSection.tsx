@@ -7,8 +7,10 @@ import { getPersonRecommendations } from '@/apis/getPersonRecommendations';
 import Button from '@/components/common/button';
 import GiftCard from '@/components/common/gift-card';
 import SectionHeading from '@/components/common/section-heading';
+import ThankYouNote from '@/components/common/thank-you-note';
 import { QUERY_KEY } from '@/consts/api';
 import { useAppUi } from '@/hooks/useAppUi';
+import { useGetMe } from '@/hooks/useGetMe';
 import { useGetPersonRecommendations } from '@/hooks/useGetPersonRecommendations';
 import type { RecommendedGiftT } from '@/types/recommendation';
 
@@ -20,6 +22,7 @@ type PersonRecommendSectionProps = {
 /** 사람 상세의 '이 사람을 위한 추천'. 관계·메모·지난 선물을 근거로 서버가 골라 준다. */
 function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
   const { showToast } = useAppUi();
+  const { meData } = useGetMe();
   const queryClient = useQueryClient();
   const { personRecommendations } = useGetPersonRecommendations(id);
 
@@ -28,6 +31,8 @@ function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const gifts = refreshed ?? personRecommendations;
+  // 한 세트에 하나뿐이라 카드마다 같은 값이 들어 있다 — 아래에 한 번만 보여준다.
+  const thankYouMessage = gifts.find(gift => gift.thankYouMessage)?.thankYouMessage;
 
   if (gifts.length === 0) return null;
 
@@ -50,7 +55,7 @@ function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
     <section className="mt-[30px]">
       <SectionHeading
         title={`${name}님께는 이런 선물 어때요?`}
-        description="관계와 지난 선물을 살펴 골랐어요."
+        description={`${meData?.name ?? '나'}님과 ${name}님의 관계와 마음 기록을 살펴 골랐어요.`}
         action={
           <Button
             variant="text"
@@ -59,7 +64,7 @@ function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            {isRefreshing ? '준비 중…' : '다시 추천받기'}
+            {isRefreshing ? '새로 고르는 중…' : '다시 추천받기'}
           </Button>
         }
       />
@@ -70,6 +75,8 @@ function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
           <GiftCard key={gift.id} gift={gift} index={index} />
         ))}
       </div>
+
+      {thankYouMessage ? <ThankYouNote message={thankYouMessage} /> : null}
     </section>
   );
 }
