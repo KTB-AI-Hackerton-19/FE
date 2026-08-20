@@ -10,12 +10,23 @@ type UploadStepProps = {
   onSkip: () => void;
 };
 
+type PickedT = { file: File; previewUrl: string };
+
 function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [picked, setPicked] = useState<PickedT | null>(null);
+
+  const handlePick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 이전 미리보기 URL 은 여기서 정리한다 — effect 없이 교체 시점에 회수.
+    if (picked) URL.revokeObjectURL(picked.previewUrl);
+    setPicked({ file, previewUrl: URL.createObjectURL(file) });
+  };
 
   const handleAnalyze = () => {
-    if (file) onAnalyze(file);
+    if (picked) onAnalyze(picked.file);
   };
 
   return (
@@ -37,21 +48,36 @@ function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
         type="file"
         accept="image/jpeg,image/png,image/heic"
         hidden
-        onChange={event => setFile(event.target.files?.[0] ?? null)}
+        onChange={handlePick}
       />
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        className="flex h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-[5px] rounded-[14px] border-[1.5px] border-dashed border-[#d8cfc5] bg-[#faf7f3] text-[#d57967]"
+        className="relative flex h-[150px] w-full cursor-pointer flex-col items-center justify-center gap-[5px] overflow-hidden rounded-[14px] border-[1.5px] border-dashed border-[#d8cfc5] bg-[#faf7f3] text-[#d57967]"
       >
-        <ImagePlus size={28} />
-        <b className="text-xs text-[#625c55]">{file?.name ?? '사진 또는 캡처 올리기'}</b>
-        <span className="text-[9px] text-[#a19a92]">
-          {file ? '분석할 준비가 되었어요' : 'JPG, PNG, HEIC'}
-        </span>
+        {picked ? (
+          <>
+            {/* 15분 만료 presigned URL 이 아니라 방금 고른 로컬 파일이라 next/image 를 쓰지 않는다. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={picked.previewUrl}
+              alt="올린 사진 미리보기"
+              className="absolute inset-0 size-full object-cover"
+            />
+            <span className="absolute inset-x-0 bottom-0 bg-[#211c19]/60 py-1.5 text-[10px] text-white">
+              다시 고르려면 눌러주세요
+            </span>
+          </>
+        ) : (
+          <>
+            <ImagePlus size={28} />
+            <b className="text-xs text-[#625c55]">사진 또는 캡처 올리기</b>
+            <span className="text-[9px] text-[#a19a92]">JPG, PNG, HEIC</span>
+          </>
+        )}
       </button>
 
-      <Button full onClick={handleAnalyze} disabled={!file} className="mt-3">
+      <Button full onClick={handleAnalyze} disabled={!picked} className="mt-3">
         <Sparkles size={18} /> AI로 마음 정리하기
       </Button>
 
