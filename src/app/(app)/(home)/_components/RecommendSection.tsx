@@ -12,13 +12,11 @@ import ThankYouNote from '@/components/common/thank-you-note';
 import { QUERY_KEY } from '@/consts/api';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
-import { useGetMe } from '@/hooks/useGetMe';
 import type { RecommendationT } from '@/types/recommendation';
 
 function RecommendSection() {
   const { dashboardData } = useGetDashboard();
   const { showToast } = useAppUi();
-  const { meData } = useGetMe();
   const queryClient = useQueryClient();
 
   // '다시 추천받기'로 새로 받은 목록은 대시보드 응답보다 우선한다.
@@ -55,7 +53,7 @@ function RecommendSection() {
         title="이런 선물은 어때요?"
         description={
           insight
-            ? `${meData?.name ?? '나'}님과 ${insight.person}님의 관계와 마음 기록을 살펴 골랐어요.`
+            ? `${insight.person}님의 관계와 마음 기록을 살펴 골랐어요.`
             : '관계와 지난 선물을 살펴 적당한 마음을 골랐어요.'
         }
         label={

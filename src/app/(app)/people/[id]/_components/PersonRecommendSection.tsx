@@ -10,7 +10,6 @@ import SectionHeading from '@/components/common/section-heading';
 import ThankYouNote from '@/components/common/thank-you-note';
 import { QUERY_KEY } from '@/consts/api';
 import { useAppUi } from '@/hooks/useAppUi';
-import { useGetMe } from '@/hooks/useGetMe';
 import { useGetPersonRecommendations } from '@/hooks/useGetPersonRecommendations';
 import type { RecommendedGiftT } from '@/types/recommendation';
 
@@ -22,7 +21,6 @@ type PersonRecommendSectionProps = {
 /** 사람 상세의 '이 사람을 위한 추천'. 관계·메모·지난 선물을 근거로 서버가 골라 준다. */
 function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
   const { showToast } = useAppUi();
-  const { meData } = useGetMe();
   const queryClient = useQueryClient();
   const { personRecommendations } = useGetPersonRecommendations(id);
 
@@ -55,7 +53,7 @@ function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
     <section className="mt-[30px]">
       <SectionHeading
         title={`${name}님께는 이런 선물 어때요?`}
-        description={`${meData?.name ?? '나'}님과 ${name}님의 관계와 마음 기록을 살펴 골랐어요.`}
+        description={`${name}님의 관계와 마음 기록을 살펴 골랐어요.`}
         action={
           <Button
             variant="text"
