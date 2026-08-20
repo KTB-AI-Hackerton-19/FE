@@ -4,9 +4,11 @@ import { Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
+import SelectionToolbar from '@/components/common/selection-toolbar';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import { useGetInfiniteGiftRecords } from '@/hooks/useGetInfiniteGiftRecords';
 
+import { useRecordSelection } from '../_hooks/useRecordSelection';
 import CategoryManagerModal from './CategoryManagerModal';
 import RecordRows from './RecordRows';
 import SortToggle from './SortToggle';
@@ -18,12 +20,24 @@ function GiftRecordList() {
   const [category, setCategory] = useState(ALL);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
   const [sort, setSort] = useState<SortKeyT>('latest');
+  const selection = useRecordSelection();
+
+  // 무한 스크롤이라 화면에 불러온 건 일부다 — 전체선택은 남은 페이지까지 불러와서 고른다.
+  const handleToggleAll = async () => {
+    if (selection.selectedIds.length === giftRecordsTotal) {
+      selection.clear();
+      return;
+    }
+
+    selection.selectAll(await loadAllGiftRecordIds());
+  };
 
   const { categoriesData } = useGetCategories();
 
   // 필터링은 서버에서 처리한다 — 전체를 받아 클라이언트에서 거르지 않는다.
   const {
     giftRecords,
+    loadAllGiftRecordIds,
     giftRecordsTotal,
     fetchNextGiftRecordsPage,
     hasNextGiftRecordsPage,
@@ -68,11 +82,19 @@ function GiftRecordList() {
         </button>
       </div>
 
-      {/* 경조사 탭과 같은 줄 구성 — 왼쪽 건수, 오른쪽 정렬 */}
-      <div className="my-[25px] mb-[11px] flex min-h-[28px] items-center justify-between gap-3 text-[11px]">
-        <b className="min-w-0 truncate">{giftRecordsTotal}개의 마음</b>
-        <SortToggle value={sort} onChange={setSort} />
-      </div>
+      {/* 경조사 탭과 같은 줄 구성 — 왼쪽 건수, 오른쪽 삭제·정렬 */}
+      <SelectionToolbar
+        isSelecting={selection.isSelecting}
+        selectedCount={selection.selectedIds.length}
+        totalCount={giftRecordsTotal}
+        onStart={selection.start}
+        onToggleAll={handleToggleAll}
+        onDelete={selection.openConfirm}
+        onCancel={selection.cancel}
+        leading={<b className="min-w-0 truncate">{giftRecordsTotal}개의 마음</b>}
+        trailing={<SortToggle value={sort} onChange={setSort} />}
+        className="my-[25px] mb-[11px]"
+      />
 
       <RecordRows
         records={giftRecords}
@@ -80,6 +102,7 @@ function GiftRecordList() {
         emptyTitle="아직 기록된 마음이 없어요"
         emptyDescription="받은 마음을 기록하러 가볼까요?"
         canRecord
+        selection={selection}
       />
 
       <InfiniteScrollSentinel

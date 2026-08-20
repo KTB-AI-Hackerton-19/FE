@@ -1,15 +1,17 @@
 'use client';
 
-import { ChevronRight, Plus, Trash2, X } from 'lucide-react';
+import { ChevronRight, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
+import CheckBox from '@/components/common/check-box';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import EmptyState from '@/components/common/empty-state';
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
 import PersonFormModal from '@/components/common/person-form-modal';
+import SelectionToolbar from '@/components/common/selection-toolbar';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPeople } from '@/hooks/useGetPeople';
 import { useDeletePeople } from '@/hooks/usePeopleMutations';
@@ -24,6 +26,8 @@ const AVATAR_TONES = [
 function PeopleList() {
   const {
     peopleData,
+    peopleTotal,
+    loadAllPeopleIds,
     fetchNextPeoplePage,
     hasNextPeoplePage,
     isFetchingNextPeoplePage,
@@ -50,6 +54,16 @@ function PeopleList() {
       current.includes(id) ? current.filter(value => value !== id) : [...current, id]
     );
 
+  // 무한 스크롤이라 화면에 불러온 건 일부다 — 전체선택은 남은 페이지까지 불러와서 고른다.
+  const toggleAll = async () => {
+    if (selectedIds.length === peopleTotal) {
+      setSelectedIds([]);
+      return;
+    }
+
+    setSelectedIds(await loadAllPeopleIds());
+  };
+
   const handleDelete = () =>
     deletePeopleMutation(selectedIds, {
       onSuccess: () => {
@@ -69,39 +83,22 @@ function PeopleList() {
     <>
       {/* 아무도 없으면 선택 삭제·등록 버튼을 감춘다 — 빈 화면의 안내 버튼 하나로 충분하다. */}
       {isEmpty ? null : (
-        <div className="mb-3 flex items-center justify-between">
-          {isSelecting ? (
-            <>
-              <span className="text-[11px] text-muted">{selectedIds.length}명 선택됨</span>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={exitSelecting}>
-                  <X size={15} /> 취소
-                </Button>
-                <Button
-                  size="sm"
-                  disabled={selectedIds.length === 0}
-                  onClick={() => setIsConfirmOpen(true)}
-                >
-                  <Trash2 size={15} /> 삭제
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => setIsSelecting(true)}
-                disabled={peopleData.length === 0}
-                className="cursor-pointer text-[11px] text-muted underline underline-offset-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                선택 삭제
-              </button>
-              <Button size="sm" onClick={() => setIsFormOpen(true)}>
-                <Plus size={15} /> 사람 등록
-              </Button>
-            </>
-          )}
-        </div>
+        <SelectionToolbar
+          isSelecting={isSelecting}
+          selectedCount={selectedIds.length}
+          totalCount={peopleTotal}
+          onStart={() => setIsSelecting(true)}
+          onToggleAll={toggleAll}
+          onDelete={() => setIsConfirmOpen(true)}
+          onCancel={exitSelecting}
+          className="mb-3"
+          leading={<b className="min-w-0 truncate text-[11px]">{peopleTotal}명</b>}
+          trailing={
+            <Button size="sm" onClick={() => setIsFormOpen(true)}>
+              <Plus size={15} /> 사람 등록
+            </Button>
+          }
+        />
       )}
 
       {isEmpty ? (
@@ -145,17 +142,11 @@ function PeopleList() {
                   type="button"
                   onClick={() => toggleSelected(person.id)}
                   aria-pressed={isSelected}
-                  className={`flex cursor-pointer items-center gap-[13px] rounded-2xl border bg-white p-4 text-left transition ${
-                    isSelected ? 'border-coral bg-coral-soft/40' : 'border-line'
+                  className={`flex cursor-pointer items-center gap-[13px] rounded-2xl border p-4 text-left transition ${
+                    isSelected ? 'border-coral bg-coral-soft/40' : 'border-line bg-white'
                   }`}
                 >
-                  <span
-                    className={`grid size-5 shrink-0 place-items-center rounded-md border text-[11px] ${
-                      isSelected ? 'border-coral bg-coral text-white' : 'border-[#d7d1c8] bg-white'
-                    }`}
-                  >
-                    {isSelected ? '✓' : ''}
-                  </span>
+                  <CheckBox checked={isSelected} />
                   {avatar}
                   {body}
                 </button>

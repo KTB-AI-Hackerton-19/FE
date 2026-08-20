@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import EmptyState from '@/components/common/empty-state';
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
+import SelectionToolbar from '@/components/common/selection-toolbar';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGetAllGiftRecords } from '@/hooks/useGetAllGiftRecords';
@@ -12,6 +13,7 @@ import { useGetEventCategories } from '@/hooks/useGetEventCategories';
 import { useGetInfiniteGiftRecords } from '@/hooks/useGetInfiniteGiftRecords';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
+import { useRecordSelection } from '../_hooks/useRecordSelection';
 import EventAmountChart from './EventAmountChart';
 import RecordRows from './RecordRows';
 import SortToggle from './SortToggle';
@@ -31,6 +33,27 @@ function EventRecordList() {
 
   const [isChartOpen, setIsChartOpen] = useState(false);
   const [sort, setSort] = useState<SortKeyT>('latest');
+  const selection = useRecordSelection();
+
+  // 무한 스크롤이라 화면에 불러온 건 일부다 — 전체선택은 남은 페이지까지 불러와서 고른다.
+  const handleToggleAll = async () => {
+    // 금액대를 고른 동안에는 전량을 이미 들고 있어 그 안에서만 고른다.
+    if (bucketRecords) {
+      selection.selectAll(
+        selection.selectedIds.length === bucketRecords.length
+          ? []
+          : bucketRecords.map(record => record.id)
+      );
+      return;
+    }
+
+    if (selection.selectedIds.length === giftRecordsTotal) {
+      selection.clear();
+      return;
+    }
+
+    selection.selectAll(await loadAllGiftRecordIds());
+  };
   /** 파이 조각을 누르면 그 금액대만 본다. 여러 개 고를 수 있다 */
   const [bucketLabels, setBucketLabels] = useState<string[]>([]);
   const debouncedKeyword = useDebouncedValue(keyword);
@@ -49,6 +72,7 @@ function EventRecordList() {
 
   const {
     giftRecords,
+    loadAllGiftRecordIds,
     giftRecordsTotal,
     fetchNextGiftRecordsPage,
     hasNextGiftRecordsPage,
@@ -130,40 +154,52 @@ function EventRecordList() {
       </label>
 
       {/* 금액대 칩이 생겨도 줄 높이가 바뀌지 않도록 높이를 고정한다 — 아래 목록이 밀리면 덜컹거린다. */}
-      <div className="my-[25px] mb-[11px] flex min-h-[28px] items-center justify-between gap-3 text-[11px]">
-        {/* 칩이 늘어도 줄바꿈으로 높이가 변하지 않도록 가로로 흘린다. */}
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto">
-          <b className="shrink-0">
-            {bucketRecords ? bucketRecords.length : giftRecordsTotal}개의 마음
-          </b>
-          {bucketLabels.map(label => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => handleToggleBucket(label)}
-              aria-label={`${label} 필터 해제`}
-              className="flex h-[22px] shrink-0 cursor-pointer items-center gap-1 rounded-full bg-[#f3ece6] px-2.5 text-[10px] font-bold text-[#7c6a5e] hover:text-ink"
-            >
-              {label}
-              <X size={12} />
-            </button>
-          ))}
-        </div>
-        <div className="flex shrink-0 items-center gap-3 pl-3">
-          {isCompact ? (
-            <button
-              type="button"
-              onClick={handleToggleChart}
-              aria-expanded={isChartOpen}
-              className="flex cursor-pointer items-center gap-1 text-[#7c7770] hover:text-ink"
-            >
-              <PieChart size={14} />
-              {isChartOpen ? '차트 닫기' : '금액 비중 보기'}
-            </button>
-          ) : null}
-          <SortToggle value={sort} onChange={setSort} />
-        </div>
-      </div>
+      <SelectionToolbar
+        isSelecting={selection.isSelecting}
+        selectedCount={selection.selectedIds.length}
+        totalCount={bucketRecords ? bucketRecords.length : giftRecordsTotal}
+        onStart={selection.start}
+        onToggleAll={handleToggleAll}
+        onDelete={selection.openConfirm}
+        onCancel={selection.cancel}
+        className="my-[25px] mb-[11px]"
+        leading={
+          /* 칩이 늘어도 줄바꿈으로 높이가 변하지 않도록 가로로 흘린다. */
+          <div className="flex min-w-0 items-center gap-2 overflow-x-auto">
+            <b className="shrink-0">
+              {bucketRecords ? bucketRecords.length : giftRecordsTotal}개의 마음
+            </b>
+            {bucketLabels.map(label => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleToggleBucket(label)}
+                aria-label={`${label} 필터 해제`}
+                className="flex h-[22px] shrink-0 cursor-pointer items-center gap-1 rounded-full bg-[#f3ece6] px-2.5 text-[10px] font-bold text-[#7c6a5e] hover:text-ink"
+              >
+                {label}
+                <X size={12} />
+              </button>
+            ))}
+          </div>
+        }
+        trailing={
+          <>
+            {isCompact ? (
+              <button
+                type="button"
+                onClick={handleToggleChart}
+                aria-expanded={isChartOpen}
+                className="flex cursor-pointer items-center gap-1 text-[#7c7770] hover:text-ink"
+              >
+                <PieChart size={14} />
+                {isChartOpen ? '차트 닫기' : '금액 비중 보기'}
+              </button>
+            ) : null}
+            <SortToggle value={sort} onChange={setSort} />
+          </>
+        }
+      />
 
       {showChart ? (
         <EventAmountChart
@@ -183,6 +219,7 @@ function EventRecordList() {
         emptyDescription={debouncedKeyword.trim() ? undefined : '받은 마음을 기록하러 가볼까요?'}
         canRecord={!debouncedKeyword.trim()}
         showCategory={activeCategory === null}
+        selection={selection}
       />
 
       {/* 금액대를 고른 동안에는 전량을 이미 들고 있어 더 불러올 것이 없다. */}

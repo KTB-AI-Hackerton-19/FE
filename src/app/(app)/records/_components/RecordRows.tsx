@@ -1,11 +1,10 @@
 'use client';
 
-import { ChevronRight, Trash2, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
-import Button from '@/components/common/button';
+import CheckBox from '@/components/common/check-box';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import EmptyState from '@/components/common/empty-state';
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
@@ -17,6 +16,8 @@ import { formatAmount } from '@/utils/formatAmount';
 import { formatDate } from '@/utils/formatDate';
 import { getRecordCategoryLabel } from '@/utils/recordLabel';
 
+import type { RecordSelectionT } from '../_hooks/useRecordSelection';
+
 type RecordRowsProps = {
   records: GiftRecordT[];
   isPending: boolean;
@@ -26,6 +27,8 @@ type RecordRowsProps = {
   canRecord?: boolean;
   /** 경조사 목록은 행마다 카테고리가 같아 감추는 편이 낫다 */
   showCategory?: boolean;
+  /** 삭제 줄이 건수·정렬과 같은 줄에 있어 상태는 부모가 들고 있는다 */
+  selection: RecordSelectionT;
 };
 
 /** 선물·경조사 탭이 함께 쓰는 기록 목록. 선택 삭제까지 여기서 처리한다. */
@@ -36,37 +39,25 @@ function RecordRows({
   emptyDescription,
   canRecord = false,
   showCategory = true,
+  selection,
 }: RecordRowsProps) {
   const { showToast, openRecordModal } = useAppUi();
   const { deleteGiftRecordsMutation, isDeleteGiftRecordsPending } = useDeleteGiftRecords();
 
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-
+  const { isSelecting, selectedIds, isConfirmOpen, toggle, cancel, closeConfirm } = selection;
   const selectedRecords = records.filter(record => selectedIds.includes(record.id));
-
-  const exitSelecting = () => {
-    setIsSelecting(false);
-    setSelectedIds([]);
-  };
-
-  const toggleSelected = (id: number) =>
-    setSelectedIds(current =>
-      current.includes(id) ? current.filter(value => value !== id) : [...current, id]
-    );
 
   const handleDelete = () =>
     deleteGiftRecordsMutation(selectedIds, {
       onSuccess: ({ deletedRecords }) => {
         // 서버가 실제로 지운 수를 돌려주므로 그대로 안내한다.
         showToast(`기록 ${deletedRecords}개를 삭제했어요`);
-        setIsConfirmOpen(false);
-        exitSelecting();
+        closeConfirm();
+        cancel();
       },
       onError: error => {
         showToast(error instanceof ApiError ? error.message : '삭제하지 못했어요');
-        setIsConfirmOpen(false);
+        closeConfirm();
       },
     });
 
@@ -83,32 +74,6 @@ function RecordRows({
 
   return (
     <>
-      <div className="mb-2.5 flex min-h-[30px] items-center justify-end gap-2">
-        {isSelecting ? (
-          <>
-            <span className="mr-auto text-[11px] text-muted">{selectedIds.length}개 선택됨</span>
-            <Button variant="ghost" size="sm" onClick={exitSelecting}>
-              <X size={15} /> 취소
-            </Button>
-            <Button
-              size="sm"
-              disabled={selectedIds.length === 0}
-              onClick={() => setIsConfirmOpen(true)}
-            >
-              <Trash2 size={15} /> 삭제
-            </Button>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsSelecting(true)}
-            className="cursor-pointer text-[11px] text-muted underline underline-offset-4 hover:text-ink"
-          >
-            선택 삭제
-          </button>
-        )}
-      </div>
-
       {/* 모바일은 1열, 데스크톱은 2열 — 한 행이 좁아지면 이름·금액이 붙어 읽기 나빠진다. */}
       <div className="grid gap-2.5 lg:grid-cols-2">
         {records.map(record => {
@@ -129,7 +94,7 @@ function RecordRows({
               {isSelecting ? (
                 <button
                   type="button"
-                  onClick={() => toggleSelected(record.id)}
+                  onClick={() => toggle(record.id)}
                   aria-pressed={isSelected}
                   aria-label={`${record.person}님의 ${record.gift} 기록 선택`}
                   className="absolute inset-0 cursor-pointer"
@@ -141,6 +106,12 @@ function RecordRows({
                   className="absolute inset-0"
                 />
               )}
+
+              {isSelecting ? (
+                <span className={`relative ${contentClass}`}>
+                  <CheckBox checked={isSelected} />
+                </span>
+              ) : null}
 
               <div
                 className={`relative ${contentClass} ${recordEmojiStyles({ accent: record.color, size: 'sm' })}`}
@@ -174,17 +145,7 @@ function RecordRows({
                     <span className="text-[9px] text-subtle">{record.recordTypeLabel}</span>
                   )}
                 </div>
-                {isSelecting ? (
-                  <span
-                    className={`grid size-5 shrink-0 place-items-center rounded-md border text-[11px] ${
-                      isSelected ? 'border-coral bg-coral text-white' : 'border-[#d7d1c8] bg-white'
-                    }`}
-                  >
-                    {isSelected ? '✓' : ''}
-                  </span>
-                ) : (
-                  <ChevronRight size={18} className="text-[#b1aba3]" />
-                )}
+                {isSelecting ? null : <ChevronRight size={18} className="text-[#b1aba3]" />}
               </div>
             </div>
           );
@@ -205,7 +166,7 @@ function RecordRows({
           }
           isPending={isDeleteGiftRecordsPending}
           onConfirm={handleDelete}
-          onCancel={() => setIsConfirmOpen(false)}
+          onCancel={closeConfirm}
         />
       ) : null}
     </>
