@@ -23,8 +23,23 @@ export const useGetInfiniteGiftRecords = (query: GiftRecordQueryT = {}) => {
     getNextPageParam: lastPage => (lastPage.last ? undefined : lastPage.page + 1),
   });
 
+  /**
+   * 남은 페이지를 끝까지 불러오고 전체 id 를 돌려준다 — '전체선택'이 화면에 불러온 것만
+   * 고르면 안 되기 때문이다. fetchNextPage 가 돌려주는 결과를 이어 받아야 최신 상태를 본다.
+   */
+  const loadAllGiftRecordIds = async () => {
+    let result = { data, hasNextPage: hasNextGiftRecordsPage };
+
+    while (result.hasNextPage) {
+      result = await fetchNextGiftRecordsPage();
+    }
+
+    return result.data?.pages.flatMap(page => page.content).map(record => record.id) ?? [];
+  };
+
   return {
     giftRecords: data?.pages.flatMap(page => page.content) ?? [],
+    loadAllGiftRecordIds,
     giftRecordsTotal: data?.pages[0]?.totalElements ?? 0,
     fetchNextGiftRecordsPage,
     hasNextGiftRecordsPage,

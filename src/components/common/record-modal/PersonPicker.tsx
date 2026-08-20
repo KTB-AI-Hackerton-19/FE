@@ -2,12 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import AddButton from '@/components/common/add-button';
 import PersonFormModal from '@/components/common/person-form-modal';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSearchPeople } from '@/hooks/useGetPeople';
 import type { PersonT } from '@/types/person';
-
-import AddButton from './AddButton';
 
 type PersonPickerProps = {
   value: string;

@@ -10,36 +10,27 @@ type ModalProps = {
   size?: 'sm' | 'md';
   /** 닫기 버튼이 따로 있는 경우(확인 다이얼로그 등) 우상단 X 를 숨긴다. */
   hideClose?: boolean;
-  /**
-   * 내용이 짧아 스크롤이 필요 없는 모달.
-   * overflow 를 열어 두어야 안에서 뜨는 달력 같은 팝오버가 잘리지 않는다.
-   */
-  noScroll?: boolean;
+  /** 이 모달 위에 다른 모달이 떠 있는 동안 감춘다. 언마운트하면 입력값이 날아간다 */
+  hidden?: boolean;
 };
 
 /**
  * 모바일에서는 바텀시트, 데스크톱에서는 가운데 팝업으로 뜬다.
  * body 에 포털로 붙는다 — 모달 위에 모달을 열 때 아래 모달을 감춰도 같이 사라지지 않아야 한다.
  */
-function Modal({
-  onClose,
-  children,
-  size = 'md',
-  hideClose = false,
-  noScroll = false,
-}: ModalProps) {
+function Modal({ onClose, children, size = 'md', hideClose = false, hidden = false }: ModalProps) {
   // 항상 상태로 열리므로 서버 렌더에는 등장하지 않는다.
   if (typeof document === 'undefined') return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-30 grid place-items-end bg-[#211c19]/50 backdrop-blur-[5px] sm:place-items-center sm:p-5"
+      className={`fixed inset-0 z-30 grid place-items-end bg-[#211c19]/50 backdrop-blur-[5px] sm:place-items-center sm:p-5 ${
+        hidden ? 'invisible' : ''
+      }`}
       onMouseDown={event => event.target === event.currentTarget && onClose()}
     >
       <div
-        className={`relative w-full rounded-t-[23px] ${
-          noScroll ? 'overflow-visible' : 'max-h-[92vh] overflow-auto'
-        } bg-[#fffdfa] px-[19px] pt-[27px] pb-[30px] shadow-[0_25px_70px_#1b171345] sm:rounded-[22px] sm:p-[34px] ${
+        className={`relative max-h-[92vh] w-full overflow-auto rounded-t-[23px] bg-[#fffdfa] px-[19px] pt-[27px] pb-[30px] shadow-[0_25px_70px_#1b171345] sm:rounded-[22px] sm:p-[34px] ${
           size === 'sm' ? 'sm:max-w-[400px]' : 'sm:max-w-[480px]'
         }`}
       >

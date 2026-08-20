@@ -12,6 +12,7 @@ import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPerson } from '@/hooks/useGetPeople';
 import { useDeletePeople } from '@/hooks/usePeopleMutations';
 import { formatDate, formatShortDate } from '@/utils/formatDate';
+import { getRecordSubtitle } from '@/utils/recordLabel';
 
 type PersonTimelineProps = {
   id: number;
@@ -120,9 +121,7 @@ function PersonTimeline({ id }: PersonTimelineProps) {
                     {formatDate(record.date)}
                   </time>
                   <h3 className="my-[3px] text-[13px]">{record.gift}</h3>
-                  <p className="text-[10px] text-[#8c867f]">
-                    {record.occasion} · {record.category}
-                  </p>
+                  <p className="text-[10px] text-[#8c867f]">{getRecordSubtitle(record)}</p>
                   <div className="mt-2.5 flex justify-between border-t border-line pt-[9px] text-[10px]">
                     <b>{record.price}</b>
                     <span className="flex items-center gap-1 text-[#c27566]">

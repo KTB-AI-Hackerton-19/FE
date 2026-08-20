@@ -24,10 +24,12 @@ export const patchPerson = ({ id, ...body }: PatchPersonRequestT) =>
 
 export const deletePerson = (id: number) => apiClient.delete<void>(API.PERSON(id));
 
-/**
- * 여러 명을 한 번에 삭제한다.
- * 벌크 엔드포인트가 생기면 이 함수 안만 바꾸면 된다.
- */
-export const deletePeople = async (ids: number[]) => {
-  await Promise.all(ids.map(deletePerson));
+export type DeletePeopleResponseT = {
+  deletedPeople: number;
+  deletedRecords: number;
+  deletedReminders: number;
 };
+
+/** 여러 명을 한 번에 삭제한다. 각자의 기록·알림·추천도 함께 사라진다. */
+export const deletePeople = (ids: number[]) =>
+  apiClient.delete<DeletePeopleResponseT>(API.PEOPLE, { ids: ids.join(',') });

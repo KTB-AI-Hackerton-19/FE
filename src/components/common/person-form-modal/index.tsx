@@ -4,7 +4,10 @@ import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
+import ChoiceButton from '@/components/common/choice-button';
+import DatePicker from '@/components/common/date-picker';
 import Modal from '@/components/common/modal';
+import RelationPicker from '@/components/common/relation-picker';
 import { useAppUi } from '@/hooks/useAppUi';
 import { usePatchPerson, usePostPerson } from '@/hooks/usePeopleMutations';
 import { GENDER_OPTIONS } from '@/types/person';
@@ -33,6 +36,8 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
   const [gender, setGender] = useState<GenderT | null>(person?.gender ?? null);
   const [birthday, setBirthday] = useState(person?.birthday ?? '');
   const [memo, setMemo] = useState(person?.memo ?? '');
+  /** 관계 추가 모달이 떠 있는 동안은 이 모달을 감춘다 (값은 유지) */
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   const isEdit = Boolean(person);
   const isPending = isPostPersonPending || isPatchPersonPending;
@@ -68,7 +73,7 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} hidden={isSubModalOpen}>
       <h2 className="mb-1.5 font-title font-bold text-[21px]">
         {isEdit ? '정보 수정' : '사람 등록'}
       </h2>
@@ -87,46 +92,44 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
           />
         </label>
 
-        <label className={labelClass}>
+        <div className={labelClass}>
           <span className={labelTextClass}>관계</span>
-          <input
+          <RelationPicker
             value={relation}
-            onChange={event => setRelation(event.target.value)}
-            placeholder="친한 친구"
+            onChange={setRelation}
+            onSubModalToggle={setIsSubModalOpen}
+            addButtonSize="lg"
             className={fieldClass}
           />
-        </label>
+        </div>
 
         <div className={labelClass}>
           <span className={labelTextClass}>성별</span>
           <div className="flex gap-1.5">
             {GENDER_OPTIONS.map(option => (
-              <button
+              <ChoiceButton
                 key={option}
-                type="button"
+                selected={gender === option}
                 // 선택 항목이라 같은 값을 다시 누르면 해제된다.
                 onClick={() => setGender(current => (current === option ? null : option))}
-                className={`flex-1 cursor-pointer rounded-[10px] border py-2.5 text-[11px] transition ${
-                  gender === option
-                    ? 'border-forest bg-forest text-white'
-                    : 'border-line bg-white text-[#7c7770] hover:border-[#d7c7bc]'
-                }`}
+                className="flex-1 py-2.5"
               >
                 {option}
-              </button>
+              </ChoiceButton>
             ))}
           </div>
         </div>
 
-        <label className={labelClass}>
+        <div className={labelClass}>
           <span className={labelTextClass}>생일</span>
-          <input
-            type="date"
+          <DatePicker
             value={birthday}
-            onChange={event => setBirthday(event.target.value)}
+            onChange={setBirthday}
+            placeholder="선택 안 함"
+            clearable
             className={fieldClass}
           />
-        </label>
+        </div>
 
         <label className={labelClass}>
           <span className={labelTextClass}>메모</span>

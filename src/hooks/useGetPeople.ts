@@ -22,8 +22,20 @@ export const useGetPeople = () => {
     getNextPageParam: lastPage => (lastPage.last ? undefined : lastPage.page + 1),
   });
 
+  /** 남은 페이지를 끝까지 불러오고 전체 id 를 돌려준다 — '전체선택'용. */
+  const loadAllPeopleIds = async () => {
+    let result = { data, hasNextPage: hasNextPeoplePage };
+
+    while (result.hasNextPage) {
+      result = await fetchNextPeoplePage();
+    }
+
+    return result.data?.pages.flatMap(page => page.content).map(person => person.id) ?? [];
+  };
+
   return {
     peopleData: data?.pages.flatMap(page => page.content) ?? [],
+    loadAllPeopleIds,
     peopleTotal: data?.pages[0]?.totalElements ?? 0,
     fetchNextPeoplePage,
     hasNextPeoplePage,
