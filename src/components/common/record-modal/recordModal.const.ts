@@ -129,7 +129,7 @@ export const draftToForm = (
   fallbackDate: string,
   personCount = 1
 ): RecordFormT => ({
-  // recordType 은 한글 라벨과 영문 코드가 섞여 있어 그대로 못 쓴다 — event 로 가른다.
+  // 경조사 여부는 event 하나로 확실히 갈린다.
   recordType: draft.event ? 'EVENT' : 'GIFT',
   personName: draft.person || draft.extractedSenderName || '',
   personCount,
