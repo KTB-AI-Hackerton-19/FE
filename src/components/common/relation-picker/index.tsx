@@ -61,35 +61,38 @@ function RelationPicker({
   return (
     <div ref={containerRef} className="relative">
       <div className="flex gap-1.5">
-        <button
-          type="button"
-          onClick={() => setIsOpen(current => !current)}
-          onKeyDown={event => event.key === 'Escape' && setIsOpen(false)}
-          className={`${className} flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-1.5 text-left`}
-        >
-          <span className={value ? 'truncate' : 'truncate text-subtle'}>{value || '선택'}</span>
-          <ChevronDown size={13} className="shrink-0 text-subtle" />
-        </button>
+        {/* 목록은 + 버튼을 뺀 칸 너비에 맞춘다 — 이 span 이 기준이 된다. */}
+        <span className="relative min-w-0 flex-1">
+          <button
+            type="button"
+            onClick={() => setIsOpen(current => !current)}
+            onKeyDown={event => event.key === 'Escape' && setIsOpen(false)}
+            className={`${className} flex w-full cursor-pointer items-center justify-between gap-1.5 text-left`}
+          >
+            <span className={value ? 'truncate' : 'truncate text-subtle'}>{value || '선택'}</span>
+            <ChevronDown size={13} className="shrink-0 text-subtle" />
+          </button>
+
+          {isOpen ? (
+            <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
+              {relationships.map(relationship => (
+                <li key={relationship.value}>
+                  <button
+                    type="button"
+                    onClick={() => handlePick(relationship.value)}
+                    className={`w-full cursor-pointer rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream ${
+                      relationship.value === value ? 'bg-cream font-bold text-coral-deep' : ''
+                    }`}
+                  >
+                    {relationship.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </span>
         <AddButton label="관계 추가" onClick={openAdd} size={addButtonSize} />
       </div>
-
-      {isOpen ? (
-        <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
-          {relationships.map(relationship => (
-            <li key={relationship.value}>
-              <button
-                type="button"
-                onClick={() => handlePick(relationship.value)}
-                className={`w-full cursor-pointer rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream ${
-                  relationship.value === value ? 'bg-cream font-bold text-coral-deep' : ''
-                }`}
-              >
-                {relationship.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
 
       {isAddOpen ? (
         <RelationAddModal onCreated={created => onChange(created.value)} onClose={closeAdd} />

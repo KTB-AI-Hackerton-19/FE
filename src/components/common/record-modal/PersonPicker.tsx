@@ -60,41 +60,44 @@ function PersonPicker({ value, onChange, onPick, onSubModalToggle, className }: 
   return (
     <div ref={containerRef} className="relative">
       <div className="flex gap-1.5">
-        <input
-          value={value}
-          onChange={event => {
-            onChange(event.target.value);
-            setIsOpen(true);
-          }}
-          onFocus={() => setIsOpen(true)}
-          onKeyDown={event => event.key === 'Escape' && setIsOpen(false)}
-          placeholder="선택 또는 검색"
-          className={`${className} min-w-0 flex-1`}
-        />
+        {/* 목록은 + 버튼을 뺀 입력칸 너비에 맞춘다 — 이 span 이 기준이 된다. */}
+        <span className="relative min-w-0 flex-1">
+          <input
+            value={value}
+            onChange={event => {
+              onChange(event.target.value);
+              setIsOpen(true);
+            }}
+            onFocus={() => setIsOpen(true)}
+            onKeyDown={event => event.key === 'Escape' && setIsOpen(false)}
+            placeholder="선택 또는 검색"
+            className={`${className} w-full`}
+          />
+
+          {isOpen && suggestions.length > 0 ? (
+            <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
+              {suggestions.map(person => (
+                <li key={person.id}>
+                  <button
+                    type="button"
+                    onClick={() => handlePick(person)}
+                    className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream"
+                  >
+                    <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f5e3dd] text-[10px] text-[#b86152]">
+                      {person.name[0]}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">{person.name}</span>
+                    <span className="shrink-0 text-[10px] text-subtle">
+                      {person.relation ?? '관계 미정'}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </span>
         <AddButton label="새로운 사람 등록" onClick={openForm} />
       </div>
-
-      {isOpen && suggestions.length > 0 ? (
-        <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
-          {suggestions.map(person => (
-            <li key={person.id}>
-              <button
-                type="button"
-                onClick={() => handlePick(person)}
-                className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream"
-              >
-                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f5e3dd] text-[10px] text-[#b86152]">
-                  {person.name[0]}
-                </span>
-                <span className="min-w-0 flex-1 truncate">{person.name}</span>
-                <span className="shrink-0 text-[10px] text-subtle">
-                  {person.relation ?? '관계 미정'}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
 
       {isFormOpen ? <PersonFormModal onCreated={handlePick} onClose={closeForm} /> : null}
     </div>
