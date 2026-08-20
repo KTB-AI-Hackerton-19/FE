@@ -89,8 +89,8 @@ function EventRecordList() {
   if (!isGetCategoriesPending && events.length === 0) {
     return (
       <EmptyState
-        title="아직 경조사 기록이 없어요"
-        description="기록을 남기면 행사별로 모아서 보여드릴게요."
+        title="아직 기록된 마음이 없어요"
+        description="마음을 기록하면 행사별로 모아서 보여드릴게요."
         actionLabel="마음 기록하기"
         onAction={openRecordModal}
       />
@@ -229,7 +229,7 @@ function EventRecordList() {
           debouncedKeyword.trim() ? '그 이름으로 찾은 기록이 없어요' : '아직 기록된 마음이 없어요'
         }
         emptyDescription={
-          debouncedKeyword.trim() ? undefined : '받은 축의금·조의금을 기록하러 가볼까요?'
+          debouncedKeyword.trim() ? undefined : '받은 마음을 기록하러 가볼까요?'
         }
         canRecord={!debouncedKeyword.trim()}
         showCategory={activeId === null}

@@ -76,7 +76,7 @@ function GiftRecordList() {
         records={giftRecords}
         isPending={isGetGiftRecordsPending}
         emptyTitle="아직 기록된 마음이 없어요"
-        emptyDescription="받은 선물을 기록하러 가볼까요?"
+        emptyDescription="받은 마음을 기록하러 가볼까요?"
         canRecord
       />
 
