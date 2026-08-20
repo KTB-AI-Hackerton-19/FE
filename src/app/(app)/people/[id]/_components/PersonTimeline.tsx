@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, ChevronLeft, Pencil, Trash2 } from 'lucide-react';
+import { Bell, ChevronLeft, Gift, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -88,26 +88,33 @@ function PersonTimeline({ id }: PersonTimelineProps) {
             <h1 className="mt-2.5 mb-[3px] font-title font-bold text-2xl">
               {personData.person.name}
             </h1>
-            <p className="text-[11px] text-[#918b83]">
-              {personData.person.relation} · 함께한 마음 {personData.person.giftCount}개
-            </p>
+            <div className="flex items-center justify-center gap-1.5">
+              {personData.person.relation ? (
+                <span className="rounded-md bg-[#f6f4f0] px-1.5 py-0.5 text-[10px] text-[#8f8a82]">
+                  {personData.person.relation}
+                </span>
+              ) : null}
+              {/* 목록 카드와 같은 표시 — 선물 아이콘에 개수만 붙인다 */}
+              <span className="flex items-center gap-0.5 text-[11px] font-bold text-[#c98878]">
+                <Gift size={13} strokeWidth={2.4} />
+                받은 마음 {personData.person.giftCount}개
+              </span>
+            </div>
           </div>
 
-          <div className="my-3 mb-7 grid grid-cols-2 rounded-2xl bg-forest px-1.5 py-3.5 text-white sm:p-[17px]">
+          <div className="my-3 mb-7 grid grid-cols-2 rounded-2xl bg-coral-soft px-1.5 py-3.5 text-coral-deep sm:p-[17px]">
             <div className="flex flex-col items-center gap-[5px]">
-              <span className="text-[9px] text-[#bed0c8]">최근 받은 날</span>
-              <b className="text-xs">{formatDate(personData.person.latestReceivedDate)}</b>
+              <span className="text-[10px] text-[#c59283]">최근 받은 날</span>
+              <b className="text-[15px]">{formatDate(personData.person.latestReceivedDate)}</b>
             </div>
-            <div className="flex flex-col items-center gap-[5px] border-l border-white/15">
-              <span className="text-[9px] text-[#bed0c8]">다가오는 알림</span>
-              <b className="text-xs">{formatDate(personData.person.upcomingReminderDate)}</b>
+            <div className="flex flex-col items-center gap-[5px] border-l border-[#eec9bd]">
+              <span className="text-[10px] text-[#c59283]">다가오는 알림</span>
+              <b className="text-[15px]">{formatDate(personData.person.upcomingReminderDate)}</b>
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <h2 className="font-title font-bold text-[19px]">주고받은 마음</h2>
-            <span className="text-[10px] text-muted">{personData.records.length}개</span>
-          </div>
+          {/* 개수는 위 프로필에 이미 있어 되풀이하지 않는다 */}
+          <h2 className="font-title font-bold text-[19px]">받은 마음</h2>
 
           <div className="mt-3">
             {personData.records.map((record, index) => (
@@ -122,7 +129,7 @@ function PersonTimeline({ id }: PersonTimelineProps) {
                   <time className="text-[9px] text-subtle" dateTime={record.date}>
                     {formatDate(record.date)}
                   </time>
-                  <h3 className="my-[3px] text-[13px]">{record.gift}</h3>
+                  <h3 className="my-[3px] text-[13px] font-bold">{record.gift}</h3>
                   <p className="text-[10px] text-[#8c867f]">{getRecordSubtitle(record)}</p>
                   <div className="mt-2.5 flex justify-between border-t border-line pt-[9px] text-[10px]">
                     <b>{record.price}</b>

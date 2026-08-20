@@ -1,12 +1,14 @@
 'use client';
 
-import { ArrowRight, CalendarDays, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, CalendarDays, Heart, Star } from 'lucide-react';
 
 import GiftBoxIcon from '@/assets/icons/gift-box.svg';
 import Button from '@/components/common/button';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import { formatKoreanDate } from '@/utils/formatDate';
+
+import { bannerClass } from './homeBanner.const';
 
 function AgentCard() {
   const { dashboardData } = useGetDashboard();
@@ -20,10 +22,10 @@ function AgentCard() {
     document.querySelector('#recommendations')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <section className="relative flex min-h-[220px] overflow-hidden rounded-[20px] bg-[linear-gradient(140deg,#fdf6f3_0%,#fbe9e2_55%,#f6d9ce_100%)] px-6 py-[27px] text-ink shadow-[0_15px_35px_#c4776618] lg:px-[39px] lg:py-[34px]">
+    <section className={bannerClass}>
       <div className="z-2 max-w-full lg:max-w-[620px]">
         <div className="inline-flex items-center gap-[7px] rounded-[20px] bg-white/70 px-[11px] py-[7px] text-[11px] font-bold text-coral-deep">
-          <Sparkles size={16} /> 마음 에이전트가 발견했어요
+          <Heart size={15} fill="currentColor" /> 잊지 않으셨죠?
         </div>
         <h2 className="mt-[15px] mb-[7px] font-title font-bold text-[21px] lg:text-[25px]">
           {insight.title}

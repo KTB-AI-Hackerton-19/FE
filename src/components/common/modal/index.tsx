@@ -3,6 +3,8 @@
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
+import { useLockBodyScroll } from '@/hooks/useLockBodyScroll';
+
 type ModalProps = {
   onClose: () => void;
   children: React.ReactNode;
@@ -19,6 +21,8 @@ type ModalProps = {
  * body 에 포털로 붙는다 — 모달 위에 모달을 열 때 아래 모달을 감춰도 같이 사라지지 않아야 한다.
  */
 function Modal({ onClose, children, size = 'md', hideClose = false, hidden = false }: ModalProps) {
+  useLockBodyScroll();
+
   // 항상 상태로 열리므로 서버 렌더에는 등장하지 않는다.
   if (typeof document === 'undefined') return null;
 

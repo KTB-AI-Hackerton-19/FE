@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, LogOut, Sparkles } from 'lucide-react';
+import { Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -47,16 +47,7 @@ function Sidebar() {
           ))}
         </nav>
 
-        <div className="mt-auto flex items-start gap-2.5 rounded-2xl bg-[#f3f7f2] p-[17px] text-[#567164]">
-          <Sparkles size={18} className="shrink-0" />
-          <p className="text-[11px] leading-[1.7]">
-            <b className="text-xs text-[#3f5f50]">받은 마음, 잊지 않도록</b>
-            <br />
-            기록부터 답례까지 AI가 함께 챙겨드려요.
-          </p>
-        </div>
-
-        <div className="mt-[17px] flex items-center gap-2.5 border-t border-line px-[5px] pt-3">
+        <div className="mt-auto flex items-center gap-2.5 border-t border-line px-[5px] pt-3">
           <Link
             href="/mypage"
             className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl transition hover:opacity-70"

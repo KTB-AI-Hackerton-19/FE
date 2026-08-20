@@ -35,18 +35,18 @@ function ThankedBadge({ id, thanked, stopPropagation = false }: ThankedBadgeProp
       onClick={handleClick}
       disabled={isPatchGiftRecordThankedPending}
       aria-pressed={thanked}
-      title={thanked ? '확인 필요로 되돌리기' : '감사 완료로 표시하기'}
+      title={thanked ? '답례 전으로 되돌리기' : '답례 완료로 표시하기'}
       className={`flex cursor-pointer items-center gap-[3px] rounded-lg px-1.5 py-1 text-[9px] transition disabled:opacity-50 ${
         thanked ? 'text-[#6b917b] hover:bg-mint-soft' : 'text-[#b27b48] hover:bg-gold-soft'
       }`}
     >
       {thanked ? (
         <>
-          <Check size={14} /> 감사 완료
+          <Check size={12} /> 답례 완료
         </>
       ) : (
         <>
-          <Clock3 size={14} /> 확인 필요
+          <Clock3 size={12} /> 답례 전
         </>
       )}
     </button>

@@ -51,25 +51,30 @@ function GiftRecordList() {
     category: category === ALL ? undefined : category,
     sort,
   });
+  // 경조사 탭 칩과 같은 모양 — 이모지를 함께 보여준다.
   const chips = [
-    ALL,
-    ...categoriesData.filter(item => item.recordCount > 0).map(item => item.name),
+    { name: ALL, emoji: null },
+    ...categoriesData
+      .filter(item => item.recordCount > 0)
+      .map(item => ({ name: item.name, emoji: item.emoji })),
   ];
 
   return (
     <>
       <div className="flex items-center gap-2 overflow-auto pb-[5px]">
-        {chips.map(name => (
+        {chips.map(({ name, emoji }) => (
           <button
             key={name}
             type="button"
             onClick={() => setCategory(name)}
-            className={`cursor-pointer rounded-[20px] border px-3.5 py-2 text-[10px] whitespace-nowrap transition ${
+            aria-pressed={category === name}
+            className={`flex shrink-0 cursor-pointer items-center gap-1 rounded-[20px] border px-3.5 py-2 text-[10px] whitespace-nowrap transition ${
               category === name
-                ? 'border-forest bg-forest text-white'
+                ? 'border-coral-soft bg-coral-soft font-bold text-coral-deep'
                 : 'border-line bg-white text-[#7c7770]'
             }`}
           >
+            {emoji ? <span>{emoji}</span> : null}
             {name}
           </button>
         ))}

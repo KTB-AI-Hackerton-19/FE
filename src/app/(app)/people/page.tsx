@@ -9,7 +9,7 @@ export default function PeoplePage() {
       <PageHeader
         eyebrow="사람들"
         title="소중한 사람들"
-        description="사람을 누르면 함께 주고받은 마음을 볼 수 있어요."
+        description="카드를 누르면 주고받은 마음과 어울리는 선물 추천을 볼 수 있어요."
       />
       <PeopleList />
     </PageContainer>

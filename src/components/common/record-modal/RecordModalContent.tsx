@@ -14,6 +14,7 @@ import {
   usePostGiftRecordExtract,
   usePostGiftRecordsBulk,
 } from '@/hooks/useGiftRecordMutations';
+import { useLockBodyScroll } from '@/hooks/useLockBodyScroll';
 import type { GiftRecordT } from '@/types/record';
 import { getTodayDateKey } from '@/utils/formatDate';
 
@@ -24,6 +25,8 @@ import { draftToForm, emptyRecordForm } from './recordModal.const';
 import type { ModalStepT, RecordFormT } from './recordModal.const';
 
 function RecordModalContent() {
+  useLockBodyScroll();
+
   const { closeRecordModal, showToast } = useAppUi();
   const { dashboardData } = useGetDashboard();
   // toISOString 은 UTC 라 한국 새벽에는 어제가 나온다 — 로컬 기준으로 계산한다.

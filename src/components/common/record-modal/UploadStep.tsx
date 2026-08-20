@@ -1,8 +1,9 @@
 'use client';
 
-import { ImagePlus, PenLine, Sparkles } from 'lucide-react';
+import { ImagePlus, PenLine, ScanLine } from 'lucide-react';
 import { useRef, useState } from 'react';
 
+import HappyGiftIcon from '@/assets/icons/happy-gift.svg';
 import Button from '@/components/common/button';
 
 type UploadStepProps = {
@@ -32,15 +33,13 @@ function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
   return (
     <>
       <div className="mx-auto grid size-12 place-items-center rounded-[15px] bg-coral-soft text-coral-deep">
-        <ImagePlus />
+        <HappyGiftIcon width={32} height={32} />
       </div>
       <h2 className="mt-3.5 mb-1.5 text-center font-title font-bold text-[23px]">
         어떤 마음을 받으셨나요?
       </h2>
       <p className="mb-[19px] text-center text-[11px] leading-[1.7] text-[#8e8880]">
-        메시지 캡처나 선물 사진을 올리면
-        <br />
-        AI가 필요한 내용을 대신 정리해드려요.
+        스크린샷이나 축의금·부의금 명부를 올리면 AI가 자동으로 기록해요.
       </p>
 
       <input
@@ -53,7 +52,7 @@ function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        className="relative flex h-[150px] w-full cursor-pointer flex-col items-center justify-center gap-[5px] overflow-hidden rounded-[14px] border-[1.5px] border-dashed border-[#d8cfc5] bg-[#faf7f3] text-[#d57967]"
+        className="relative flex h-[150px] w-full cursor-pointer flex-col items-center justify-center gap-[5px] overflow-hidden rounded-[14px] border border-line bg-[#faf7f3] text-[#d57967] transition hover:bg-[#f6f1eb]"
       >
         {picked ? (
           <>
@@ -71,14 +70,13 @@ function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
         ) : (
           <>
             <ImagePlus size={28} />
-            <b className="text-xs text-[#625c55]">사진 또는 캡처 올리기</b>
             <span className="text-[9px] text-[#a19a92]">JPG, PNG, HEIC</span>
           </>
         )}
       </button>
 
       <Button full onClick={handleAnalyze} disabled={!picked} className="mt-3">
-        <Sparkles size={18} /> AI로 마음 정리하기
+        <ScanLine size={18} /> AI로 사진 분석하기
       </Button>
 
       <div className="my-3.5 flex items-center gap-2.5 text-[9px] text-[#aaa49d]">
@@ -88,7 +86,7 @@ function UploadStep({ onAnalyze, onSkip }: UploadStepProps) {
       </div>
 
       <Button variant="ghost" full onClick={onSkip}>
-        <PenLine size={17} /> 사진 없이 직접 입력하기
+        <PenLine size={17} /> 직접 입력하기
       </Button>
     </>
   );
