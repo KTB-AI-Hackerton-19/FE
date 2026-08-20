@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
+import ChoiceButton from '@/components/common/choice-button';
 import DatePicker from '@/components/common/date-picker';
 import Modal from '@/components/common/modal';
 import RelationPicker from '@/components/common/relation-picker';
@@ -106,19 +107,15 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
           <span className={labelTextClass}>성별</span>
           <div className="flex gap-1.5">
             {GENDER_OPTIONS.map(option => (
-              <button
+              <ChoiceButton
                 key={option}
-                type="button"
+                selected={gender === option}
                 // 선택 항목이라 같은 값을 다시 누르면 해제된다.
                 onClick={() => setGender(current => (current === option ? null : option))}
-                className={`flex-1 cursor-pointer rounded-[10px] border py-2.5 text-[11px] transition ${
-                  gender === option
-                    ? 'border-forest bg-forest text-white'
-                    : 'border-line bg-white text-[#7c7770] hover:border-[#d7c7bc]'
-                }`}
+                className="flex-1 py-2.5"
               >
                 {option}
-              </button>
+              </ChoiceButton>
             ))}
           </div>
         </div>

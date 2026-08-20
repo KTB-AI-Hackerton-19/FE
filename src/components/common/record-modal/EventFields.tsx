@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import ChoiceButton from '@/components/common/choice-button';
 import DatePicker from '@/components/common/date-picker';
 import { useGetEventCategories } from '@/hooks/useGetEventCategories';
 import type { EventCategoryT, EventGroupT } from '@/types/eventCategory';
@@ -115,19 +116,14 @@ function EventFields({
         <span className={labelTextClass}>경사·조사</span>
         <div className="flex gap-1.5">
           {EVENT_GROUPS.map(option => (
-            <button
+            <ChoiceButton
               key={option.key}
-              type="button"
+              selected={groupValue === option.key}
               onClick={() => onGroupChange(option.key)}
-              aria-pressed={groupValue === option.key}
-              className={`h-9 flex-1 cursor-pointer rounded-[10px] border text-[11px] font-bold transition ${
-                groupValue === option.key
-                  ? 'border-coral-soft bg-coral-soft text-coral-deep'
-                  : 'border-line bg-white text-[#a5a09a] hover:border-[#d7c7bc] hover:text-[#7c7770]'
-              }`}
+              className="h-9 flex-1"
             >
               {option.label}
-            </button>
+            </ChoiceButton>
           ))}
         </div>
       </div>
