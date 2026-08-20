@@ -7,12 +7,12 @@ import { useState } from 'react';
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import EmptyState from '@/components/common/empty-state';
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
+import PersonFormModal from '@/components/common/person-form-modal';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPeople } from '@/hooks/useGetPeople';
 import { useDeletePeople } from '@/hooks/usePeopleMutations';
-
-import PersonFormModal from './PersonFormModal';
 
 const AVATAR_TONES = [
   'bg-[#f5e3dd] text-[#b86152]',
@@ -63,46 +63,54 @@ function PeopleList() {
       },
     });
 
+  const isEmpty = peopleData.length === 0 && !isGetPeoplePending;
+
   return (
     <>
-      <div className="mb-3 flex items-center justify-between">
-        {isSelecting ? (
-          <>
-            <span className="text-[11px] text-muted">{selectedIds.length}명 선택됨</span>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={exitSelecting}>
-                <X size={15} /> 취소
-              </Button>
-              <Button
-                size="sm"
-                disabled={selectedIds.length === 0}
-                onClick={() => setIsConfirmOpen(true)}
+      {/* 아무도 없으면 선택 삭제·등록 버튼을 감춘다 — 빈 화면의 안내 버튼 하나로 충분하다. */}
+      {isEmpty ? null : (
+        <div className="mb-3 flex items-center justify-between">
+          {isSelecting ? (
+            <>
+              <span className="text-[11px] text-muted">{selectedIds.length}명 선택됨</span>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={exitSelecting}>
+                  <X size={15} /> 취소
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={selectedIds.length === 0}
+                  onClick={() => setIsConfirmOpen(true)}
+                >
+                  <Trash2 size={15} /> 삭제
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setIsSelecting(true)}
+                disabled={peopleData.length === 0}
+                className="cursor-pointer text-[11px] text-muted underline underline-offset-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <Trash2 size={15} /> 삭제
+                선택 삭제
+              </button>
+              <Button size="sm" onClick={() => setIsFormOpen(true)}>
+                <Plus size={15} /> 사람 등록
               </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={() => setIsSelecting(true)}
-              disabled={peopleData.length === 0}
-              className="cursor-pointer text-[11px] text-muted underline underline-offset-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              선택 삭제
-            </button>
-            <Button size="sm" onClick={() => setIsFormOpen(true)}>
-              <Plus size={15} /> 사람 등록
-            </Button>
-          </>
-        )}
-      </div>
-
-      {peopleData.length === 0 && !isGetPeoplePending ? (
-        <div className="rounded-2xl border border-dashed border-[#d8d2ca] bg-white p-8 text-center text-[11px] text-muted">
-          아직 등록된 사람이 없어요. 마음을 기록하면 자동으로 추가돼요.
+            </>
+          )}
         </div>
+      )}
+
+      {isEmpty ? (
+        <EmptyState
+          title="아직 등록된 사람이 없어요"
+          description="마음을 주고받은 소중한 사람은 누구인가요?"
+          actionLabel="사람 등록하기"
+          onAction={() => setIsFormOpen(true)}
+        />
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
           {peopleData.map((person, index) => {

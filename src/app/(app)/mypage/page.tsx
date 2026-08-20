@@ -1,5 +1,3 @@
-import type { Metadata } from 'next';
-
 import PageContainer from '@/components/common/page-container';
 import PageHeader from '@/components/common/page-header';
 import StatsGrid from '@/components/common/stats-grid';
@@ -7,10 +5,6 @@ import StatsGrid from '@/components/common/stats-grid';
 import AccountActions from './_components/AccountActions';
 import ProfileCard from './_components/ProfileCard';
 import SectionTitle from './_components/SectionTitle';
-
-export const metadata: Metadata = {
-  title: '마이페이지 — Giftie',
-};
 
 export default function MyPage() {
   return (

@@ -9,6 +9,17 @@ import type { NextConfig } from 'next';
 const apiProxyTarget = process.env.API_PROXY_TARGET?.replace(/\/$/, '');
 
 const nextConfig: NextConfig = {
+  // .svg 를 React 컴포넌트로 import 한다 (src/assets/*.svg).
+  // public/ 의 파비콘처럼 URL 로 요청되는 파일은 이 규칙을 타지 않는다.
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
+
   async rewrites() {
     if (!apiProxyTarget) return [];
 

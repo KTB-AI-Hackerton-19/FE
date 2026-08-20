@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
-import PersonFormModal from '@/app/(app)/people/_components/PersonFormModal';
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import PersonFormModal from '@/components/common/person-form-modal';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPerson } from '@/hooks/useGetPeople';
 import { useDeletePeople } from '@/hooks/usePeopleMutations';

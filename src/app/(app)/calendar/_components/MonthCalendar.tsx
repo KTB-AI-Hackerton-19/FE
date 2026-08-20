@@ -1,9 +1,10 @@
 'use client';
 
-import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import EmptyState from '@/components/common/empty-state';
 import { useGetCalendar } from '@/hooks/useGetCalendar';
 import { formatKoreanDate, toDateKey } from '@/utils/formatDate';
 
@@ -163,10 +164,10 @@ function MonthCalendar({ today }: MonthCalendarProps) {
             ))}
           </div>
         ) : (
-          <div className="rounded-[14px] border border-dashed border-[#d8d2ca] bg-white p-[26px] text-center text-muted">
-            <CalendarDays size={24} className="mx-auto" />
-            <p className="mt-[5px] text-[10px]">기록된 마음이 없는 날이에요.</p>
-          </div>
+          <EmptyState
+            title="이날은 기록된 마음이 없어요"
+            description="다른 날짜를 눌러 확인해보세요."
+          />
         )}
       </section>
     </>

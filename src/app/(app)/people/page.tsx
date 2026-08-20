@@ -1,13 +1,7 @@
-import type { Metadata } from 'next';
-
 import PageContainer from '@/components/common/page-container';
 import PageHeader from '@/components/common/page-header';
 
 import PeopleList from './_components/PeopleList';
-
-export const metadata: Metadata = {
-  title: '사람들 — Giftie',
-};
 
 export default function PeoplePage() {
   return (

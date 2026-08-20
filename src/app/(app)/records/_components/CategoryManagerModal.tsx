@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Info, Pencil, Plus } from 'lucide-react';
+import { Check, Pencil } from 'lucide-react';
 import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
@@ -27,7 +27,8 @@ type CategoryManagerModalProps = {
 };
 
 function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
-  const { categoriesData } = useGetCategories();
+  // 선물 탭에서 여는 관리 모달이라 선물 카테고리만 다룬다 — 행사는 경조사 탭에서 관리한다.
+  const { categoriesData } = useGetCategories({ kind: 'GIFT' });
   const { postCategoryMutation, isPostCategoryPending } = usePostCategory();
   const { patchCategoryMutation, isPatchCategoryPending } = usePatchCategory();
   const { showToast } = useAppUi();
@@ -60,7 +61,13 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
     event.preventDefault();
     if (!name.trim()) return;
 
-    const body = { name: name.trim(), emoji: emoji.trim() || undefined, color };
+    // kind 를 명시해 둔다 — 서버 기본값이 바뀌어도 여기서 행사가 만들어지면 안 된다.
+    const body = {
+      name: name.trim(),
+      emoji: emoji.trim() || undefined,
+      color,
+      kind: 'GIFT',
+    } as const;
 
     if (editing) {
       patchCategoryMutation(
@@ -92,13 +99,6 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
         기록을 분류하는 카테고리예요. 추가하면 기록 모달과 필터에 바로 나타나요.
       </p>
 
-      <div className="mb-4 flex items-start gap-2 rounded-xl bg-[#f3f7f2] p-3 text-[10px] leading-[1.6] text-[#567164]">
-        <Info size={14} className="mt-px shrink-0" />
-        <span>
-          카테고리는 모든 사용자가 함께 쓰는 목록이에요. 추가·수정하면 다른 사람 화면에도 반영돼요.
-        </span>
-      </div>
-
       <div className="mb-5 overflow-hidden rounded-[14px] border border-line bg-white">
         {categoriesData.map(category => (
           <div
@@ -126,7 +126,7 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
 
       <form onSubmit={handleSubmit} className="rounded-[14px] bg-[#f6f4f0] p-3.5">
         <p className="mb-2.5 text-[11px] font-bold text-[#817b74]">
-          {editing ? `'${editing.name}' 수정` : '새 카테고리 추가'}
+          {editing ? `'${editing.name}' 수정` : '카테고리 추가'}
         </p>
 
         <div className="flex gap-2">
@@ -148,7 +148,6 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
         </div>
 
         <div className="mt-2.5 flex items-center gap-2">
-          <span className="text-[10px] text-[#817b74]">색</span>
           {COLORS.map(option => (
             <button
               key={option}
@@ -171,7 +170,7 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
             </Button>
           ) : null}
           <Button type="submit" size="sm" full disabled={isPending || !name.trim()}>
-            <Plus size={15} /> {editing ? '수정하기' : '추가하기'}
+            {editing ? '수정하기' : '추가하기'}
           </Button>
         </div>
       </form>

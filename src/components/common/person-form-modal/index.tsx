@@ -18,10 +18,12 @@ const labelTextClass = 'text-[10px] font-bold text-[#817b74]';
 type PersonFormModalProps = {
   /** 있으면 수정, 없으면 새로 등록 */
   person?: PersonT;
+  /** 등록·수정된 사람을 바로 골라 쓰고 싶을 때 (기록 모달) */
+  onCreated?: (created: PersonT) => void;
   onClose: () => void;
 };
 
-function PersonFormModal({ person, onClose }: PersonFormModalProps) {
+function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
   const { showToast } = useAppUi();
   const { postPersonMutation, isPostPersonPending } = usePostPerson();
   const { patchPersonMutation, isPatchPersonPending } = usePatchPerson();
@@ -51,8 +53,9 @@ function PersonFormModal({ person, onClose }: PersonFormModalProps) {
       memo: memo.trim() || undefined,
     };
 
-    const onSuccess = () => {
+    const onSuccess = (saved: PersonT) => {
       showToast(isEdit ? '정보를 수정했어요' : '새로운 사람을 등록했어요');
+      onCreated?.(saved);
       onClose();
     };
 

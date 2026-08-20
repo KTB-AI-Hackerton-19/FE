@@ -73,58 +73,64 @@ function LoginForm() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[420px] flex-col justify-center px-6 py-16">
-      <div className="mb-8 text-center">
-        <div className="mx-auto grid size-14 place-items-center rounded-[18px_18px_18px_6px] bg-coral text-white shadow-[0_10px_24px_#ed7b6940]">
-          <Heart size={26} fill="currentColor" />
+    <section className="flex w-full flex-col justify-center bg-cream px-6 py-16 lg:bg-white lg:px-14 xl:px-20">
+      <div className="mx-auto w-full max-w-[380px]">
+        <div className="mb-8 text-center">
+          <div className="mx-auto grid size-14 place-items-center rounded-[18px_18px_18px_6px] bg-coral text-white shadow-[0_10px_24px_#ed7b6940]">
+            <Heart size={26} fill="currentColor" />
+          </div>
+          <h1 className="font-logo mt-4 text-[32px] font-extrabold tracking-[-0.01em]">Giftie</h1>
+          <p className="mt-1 text-xs text-muted">받은 마음을 잊지 않도록, 기록부터 답례까지</p>
         </div>
-        <h1 className="font-logo mt-4 text-[32px] font-extrabold tracking-[-0.01em]">Giftie</h1>
-        <p className="mt-1 text-xs text-muted">받은 마음을 잊지 않도록, 기록부터 답례까지</p>
-      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-        {isSignup ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+          {isSignup ? (
+            <label className={labelClass}>
+              <span className={labelTextClass}>이름</span>
+              <input
+                className={fieldClass}
+                maxLength={20}
+                autoComplete="name"
+                {...register('name')}
+              />
+            </label>
+          ) : null}
+
           <label className={labelClass}>
-            <span className={labelTextClass}>이름</span>
+            <span className={labelTextClass}>아이디</span>
+            <input className={fieldClass} autoComplete="username" {...register('username')} />
+          </label>
+
+          <label className={labelClass}>
+            <span className={labelTextClass}>비밀번호</span>
             <input
+              type="password"
               className={fieldClass}
-              placeholder="박소영"
-              autoComplete="name"
-              {...register('name')}
+              placeholder={isSignup ? '4자 이상' : undefined}
+              autoComplete={isSignup ? 'new-password' : 'current-password'}
+              {...register('password')}
             />
           </label>
-        ) : null}
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>아이디</span>
-          <input className={fieldClass} autoComplete="username" {...register('username')} />
-        </label>
+          {message ? <p className="text-[11px] text-coral-dark">{message}</p> : null}
 
-        <label className={labelClass}>
-          <span className={labelTextClass}>비밀번호</span>
-          <input
-            type="password"
-            className={fieldClass}
-            autoComplete={isSignup ? 'new-password' : 'current-password'}
-            {...register('password')}
-          />
-        </label>
+          <Button type="submit" full disabled={isPending} className="mt-2">
+            {isSignup ? '회원가입하고 시작하기' : '로그인'}
+          </Button>
+        </form>
 
-        {message ? <p className="text-[11px] text-coral-dark">{message}</p> : null}
-
-        <Button type="submit" full disabled={isPending} className="mt-2">
-          {isSignup ? '회원가입하고 시작하기' : '로그인'}
-        </Button>
-      </form>
-
-      <button
-        type="button"
-        onClick={handleToggleMode}
-        className="mt-5 cursor-pointer text-center text-[11px] text-muted underline underline-offset-4"
-      >
-        {isSignup ? '이미 계정이 있다면 로그인' : '계정이 없다면 회원가입'}
-      </button>
-    </main>
+        <p className="mt-6 text-center text-[12px] text-muted">
+          {isSignup ? '이미 계정이 있으신가요?' : '계정이 없으신가요?'}{' '}
+          <button
+            type="button"
+            onClick={handleToggleMode}
+            className="cursor-pointer font-bold text-coral-deep underline-offset-4 hover:underline"
+          >
+            {isSignup ? '로그인' : '회원가입'}
+          </button>
+        </p>
+      </div>
+    </section>
   );
 }
 

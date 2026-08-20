@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
-import SadGiftIcon from '@/assets/icons/SadGiftIcon';
+import SadGiftIcon from '@/assets/icons/sad-gift.svg';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import LogoutConfirmDialog from '@/components/common/logout-confirm-dialog';
 import { useAppUi } from '@/hooks/useAppUi';
@@ -73,7 +73,7 @@ function AccountActions() {
         <ConfirmDialog
           title={`${meData?.name ?? '사용자'}님, Giftie를 떠나시나요?`}
           description="지금까지의 마음 기록이 모두 사라져요."
-          icon={<SadGiftIcon />}
+          icon={<SadGiftIcon width={32} height={32} />}
           confirmLabel="탈퇴하기"
           cancelLabel="더 써볼래요"
           isPending={isDeleteMePending}

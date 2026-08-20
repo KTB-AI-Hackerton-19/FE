@@ -1,10 +1,13 @@
 'use client';
 
-import { PieChart, Search, X } from 'lucide-react';
+import { PieChart, Plus, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
+import CategoryAddModal from '@/components/common/category-add-modal';
+import EmptyState from '@/components/common/empty-state';
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
+import { useAppUi } from '@/hooks/useAppUi';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useGetAllGiftRecords } from '@/hooks/useGetAllGiftRecords';
 import { useGetCategories } from '@/hooks/useGetCategories';
@@ -28,7 +31,10 @@ function EventRecordList() {
   /** null 이면 모든 경조사를 함께 본다 */
   const [activeId, setActiveId] = useState<number | null>(null);
   const [keyword, setKeyword] = useState('');
+  const { openRecordModal } = useAppUi();
+
   const [isChartOpen, setIsChartOpen] = useState(false);
+  const [isEventAddOpen, setIsEventAddOpen] = useState(false);
   const [sort, setSort] = useState<SortKeyT>('latest');
   /** 파이 조각을 누르면 그 금액대만 본다. 여러 개 고를 수 있다 */
   const [bucketLabels, setBucketLabels] = useState<string[]>([]);
@@ -82,23 +88,26 @@ function EventRecordList() {
 
   if (!isGetCategoriesPending && events.length === 0) {
     return (
-      <div className="rounded-[17px] border border-dashed border-[#d8d2ca] bg-white p-8 text-center text-[11px] text-muted">
-        아직 경조사 기록이 없어요. 기록을 남기면 행사별로 모아서 보여드릴게요.
-      </div>
+      <EmptyState
+        title="아직 기록된 마음이 없어요"
+        description="마음을 기록하면 행사별로 모아서 보여드릴게요."
+        actionLabel="마음 기록하기"
+        onAction={openRecordModal}
+      />
     );
   }
 
   return (
     <>
-      <div className="grid gap-2.5">
+      <div className="grid gap-2.5 lg:grid-cols-2">
         <button
           type="button"
           onClick={() => setActiveId(null)}
           aria-pressed={activeId === null}
-          className={`flex cursor-pointer items-center gap-3 rounded-[17px] border bg-white p-3.5 text-left transition sm:p-4 ${
+          className={`flex cursor-pointer items-center gap-3 rounded-[17px] border p-3.5 text-left transition sm:p-4 lg:col-span-2 ${
             activeId === null
-              ? 'border-ink shadow-[0_8px_20px_#4b3a3212]'
-              : 'border-line hover:bg-[#fdfaf7]'
+              ? 'border-ink bg-[#f6f1ea] shadow-[0_8px_20px_#4b3a3212]'
+              : 'border-line bg-[#faf7f2] hover:bg-[#f6f1ea]'
           }`}
         >
           <div className="grid size-[43px] shrink-0 place-items-center rounded-[14px] bg-[#f1ede8] text-[20px]">
@@ -143,9 +152,19 @@ function EventRecordList() {
               </p>
             </div>
 
-            <span className="shrink-0 text-[10px] text-subtle">{formatDate(event.latestDate)}</span>
+            <span className="shrink-0 text-[10px] text-subtle">
+              {formatDate(event.displayDate)}
+            </span>
           </button>
         ))}
+
+        <button
+          type="button"
+          onClick={() => setIsEventAddOpen(true)}
+          className="flex cursor-pointer items-center justify-center gap-1.5 rounded-[17px] border border-dashed border-[#d7c7bc] bg-[#fff7f2] p-3.5 text-[11px] font-bold text-[#cf6e5d] transition hover:bg-[#ffefe6] sm:p-4"
+        >
+          <Plus size={16} /> 행사 추가
+        </button>
       </div>
 
       <label className="mt-3.5 flex items-center gap-2.5 rounded-[14px] border border-line bg-white px-[13px] py-3 text-subtle">
@@ -206,11 +225,30 @@ function EventRecordList() {
       <RecordRows
         records={records}
         isPending={isGetGiftRecordsPending}
-        emptyText={
-          debouncedKeyword.trim() ? '그 이름으로 찾은 기록이 없어요.' : '아직 기록이 없어요.'
+        emptyTitle={
+          debouncedKeyword.trim() ? '그 이름으로 찾은 기록이 없어요' : '아직 기록된 마음이 없어요'
         }
+        emptyDescription={
+          debouncedKeyword.trim() ? undefined : '받은 마음을 기록하러 가볼까요?'
+        }
+        canRecord={!debouncedKeyword.trim()}
         showCategory={activeId === null}
       />
+
+      {isEventAddOpen ? (
+        <CategoryAddModal
+          kinds={[
+            { key: 'CELEBRATION', label: '경사' },
+            { key: 'CONDOLENCE', label: '조사' },
+          ]}
+          title="새 행사 추가"
+          nameLabel="행사 이름"
+          namePlaceholder="내 결혼식"
+          withDate
+          onCreated={created => setActiveId(created.id)}
+          onClose={() => setIsEventAddOpen(false)}
+        />
+      ) : null}
 
       {/* 금액대를 고른 동안에는 전량을 이미 들고 있어 더 불러올 것이 없다. */}
       {bucketRecords ? null : (
