@@ -12,6 +12,8 @@ import { useAppUi } from '@/hooks/useAppUi';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import type { RecommendationT } from '@/types/recommendation';
 
+import GiftThumbnail from './GiftThumbnail';
+
 const TONES = ['bg-[#e9f1ed]', 'bg-[#f5ede2]', 'bg-[#f7e9e7]'];
 
 const cardFooterClass =
@@ -79,10 +81,13 @@ function RecommendSection() {
             key={`${group.personId}-${gift.id}`}
             className="min-w-[78%] snap-start overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_14px_30px_#503e3514] lg:min-w-0"
           >
-            <div
-              className={`relative grid h-[125px] place-items-center text-[51px] ${TONES[index % TONES.length]}`}
-            >
-              {gift.emoji}
+            <div className="relative h-[125px]">
+              <GiftThumbnail
+                imageUrl={gift.imageUrl}
+                emoji={gift.emoji}
+                name={gift.name}
+                toneClass={TONES[index % TONES.length]}
+              />
               <span className="absolute top-2.5 left-[11px] rounded-[10px] bg-white px-2 py-[5px] text-[8px] font-bold text-[#7a746c]">
                 {gift.tag}
               </span>
