@@ -6,6 +6,7 @@ import { useForm, useWatch } from 'react-hook-form';
 
 import Button from '@/components/common/button';
 import DatePicker from '@/components/common/date-picker';
+import FieldLabel from '@/components/common/field-label';
 import RelationPicker from '@/components/common/relation-picker';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import type { PersonT } from '@/types/person';
@@ -207,7 +208,9 @@ function ConfirmStep({
           {isMany ? null : (
             // 경조사는 관계 칸이 빠지고 칩이 아래로 늘어나므로 한 줄을 다 쓴다.
             <div className={tab.isEvent ? `${labelClass} col-span-2` : labelClass}>
-              <span className={labelTextClass}>보낸 사람</span>
+              <FieldLabel required className={labelTextClass}>
+                보낸 사람
+              </FieldLabel>
               {tab.isEvent ? (
                 <GuestPicker
                   guests={guests}
@@ -260,12 +263,16 @@ function ConfirmStep({
             </label>
           ) : null}
           <label className={labelClass}>
-            <span className={labelTextClass}>{tab.giftLabel}</span>
+            <FieldLabel required className={labelTextClass}>
+              {tab.giftLabel}
+            </FieldLabel>
             <input className={fieldClass} placeholder={tab.giftPlaceholder} {...register('gift')} />
           </label>
           {isMany ? null : (
             <div className={labelClass}>
-              <span className={labelTextClass}>금액</span>
+              <FieldLabel required className={labelTextClass}>
+                금액
+              </FieldLabel>
               <AmountInput
                 value={price}
                 onChange={next => setValue('price', next)}

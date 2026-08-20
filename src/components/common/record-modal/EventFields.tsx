@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import DatePicker from '@/components/common/date-picker';
+import FieldLabel from '@/components/common/field-label';
 import { useGetEventCategories } from '@/hooks/useGetEventCategories';
 import type { EventCategoryT } from '@/types/eventCategory';
 
@@ -69,7 +70,9 @@ function EventFields({
   return (
     <>
       <div className={labelClass}>
-        <span className={labelTextClass}>경조사 유형</span>
+        <FieldLabel required className={labelTextClass}>
+          경조사 유형
+        </FieldLabel>
         <div ref={containerRef} className="relative">
           <button
             type="button"
