@@ -42,11 +42,11 @@ function ThankedBadge({ id, thanked, stopPropagation = false }: ThankedBadgeProp
     >
       {thanked ? (
         <>
-          <Check size={14} /> 답례 완료
+          <Check size={12} /> 답례 완료
         </>
       ) : (
         <>
-          <Clock3 size={14} /> 답례 전
+          <Clock3 size={12} /> 답례 전
         </>
       )}
     </button>
