@@ -113,10 +113,8 @@ function PersonTimeline({ id }: PersonTimelineProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <h2 className="font-title font-bold text-[19px]">받은 마음</h2>
-            <span className="text-[10px] text-muted">{personData.records.length}개</span>
-          </div>
+          {/* 개수는 위 프로필에 이미 있어 되풀이하지 않는다 */}
+          <h2 className="font-title font-bold text-[19px]">받은 마음</h2>
 
           <div className="mt-3">
             {personData.records.map((record, index) => (
