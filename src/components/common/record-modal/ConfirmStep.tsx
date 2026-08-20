@@ -19,6 +19,7 @@ import {
   EVENT_GIFT_DEFAULTS,
   GIFT_CATEGORY_ADD,
   KIND_TABS,
+  emptyRecordForm,
   recordFormSchema,
 } from './recordModal.const';
 import type { RecordFormT } from './recordModal.const';
@@ -51,6 +52,7 @@ function ConfirmStep({
     handleSubmit,
     setValue,
     getValues,
+    reset,
     control,
     formState: { errors },
   } = useForm<RecordFormT>({
@@ -82,18 +84,15 @@ function ConfirmStep({
     }
   };
 
+  /**
+   * 탭을 바꾸면 적어 둔 값과 오류 문구를 모두 비운다.
+   * 두 탭은 저장하는 항목이 달라, 남은 값이 안 보이는 채로 저장되면 안 된다.
+   */
   const handlePickKind = (next: RecordTypeT) => {
-    setValue('recordType', next);
+    if (next === recordType) return;
 
-    if (next === 'EVENT') {
-      fillEventGift(getValues('eventGroup'));
-      // 경조사 탭에는 '받은 이유' 칸이 없으니, 안 보이는 값이 몰래 저장되지 않도록 비운다.
-      setValue('occasion', '');
-      return;
-    }
-
-    // 선물 탭에 축의금·조의금이 남아 있으면 안 된다.
-    if (isAutoFilledGift()) setValue('gift', '');
+    reset({ ...emptyRecordForm(defaultValues.date), recordType: next });
+    if (next === 'EVENT') fillEventGift(getValues('eventGroup'));
   };
 
   // 등록된 사람을 고르면 관계까지 채우고, 이후 요청은 personId 로 보낸다.
@@ -114,7 +113,7 @@ function ConfirmStep({
         {isDraft ? '이렇게 기록하면 될까요?' : '마음을 기록할게요'}
       </h2>
       <p className="mb-[15px] text-center text-[11px] leading-[1.7] text-[#8e8880]">
-        금액과 카테고리, 알림일을 확인해주세요.
+        {tab.description}
       </p>
 
       <div className="mb-[15px] flex justify-center">

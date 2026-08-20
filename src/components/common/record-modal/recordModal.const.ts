@@ -49,6 +49,7 @@ export const KIND_TABS = [
   {
     key: 'GIFT',
     label: '선물',
+    description: '금액과 카테고리, 알림일을 확인해주세요.',
     categoryLabel: '선물 카테고리',
     giftLabel: '받은 선물',
     giftPlaceholder: '스타벅스 케이크',
@@ -59,6 +60,7 @@ export const KIND_TABS = [
   {
     key: 'EVENT',
     label: '경조사',
+    description: '행사와 금액, 알림일을 확인해주세요.',
     categoryLabel: '행사 유형',
     // 경조사에서 이 칸에 들어가는 값은 조의금·축의금이라 '선물'로 부르면 어색하다.
     giftLabel: '받은 마음',
@@ -73,6 +75,7 @@ export const KIND_TABS = [
 ] as const satisfies readonly {
   key: RecordTypeT;
   label: string;
+  description: string;
   categoryLabel: string;
   giftLabel: string;
   giftPlaceholder: string;
