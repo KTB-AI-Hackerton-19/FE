@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, CalendarDays, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, CalendarDays, Heart, Star } from 'lucide-react';
 
 import GiftBoxIcon from '@/assets/icons/gift-box.svg';
 import Button from '@/components/common/button';
@@ -25,7 +25,7 @@ function AgentCard() {
     <section className={bannerClass}>
       <div className="z-2 max-w-full lg:max-w-[620px]">
         <div className="inline-flex items-center gap-[7px] rounded-[20px] bg-white/70 px-[11px] py-[7px] text-[11px] font-bold text-coral-deep">
-          <Sparkles size={16} /> 곧 챙길 마음이에요
+          <Heart size={15} fill="currentColor" /> 잊지 않으셨죠?
         </div>
         <h2 className="mt-[15px] mb-[7px] font-title font-bold text-[21px] lg:text-[25px]">
           {insight.title}
