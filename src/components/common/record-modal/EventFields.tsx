@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import AddButton from '@/components/common/add-button';
 import CategoryAddModal from '@/components/common/category-add-modal';
 import type { CategoryT, KindT } from '@/types/category';
-
-import AddButton from './AddButton';
 
 const EVENT_KINDS = [
   { key: 'CELEBRATION', label: '경사' },
