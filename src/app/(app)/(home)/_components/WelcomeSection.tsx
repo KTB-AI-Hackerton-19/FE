@@ -1,6 +1,8 @@
 'use client';
 
-import LetterIcon from '@/assets/icons/letter.svg';
+import { Heart } from 'lucide-react';
+
+import Gift3dIcon from '@/assets/icons/gift-3d.svg';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import { formatFullKoreanDate } from '@/utils/formatDate';
 
@@ -20,18 +22,32 @@ function WelcomeSection() {
         </h1>
       </div>
 
-      <div className="relative mr-[30px] hidden size-[170px] h-[140px] place-items-center rounded-[48%_52%_55%_45%] bg-[#f5e5df] lg:grid">
-        <LetterIcon
-          width={74}
-          height={74}
-          className="rotate-[-7deg] text-coral drop-shadow-[0_10px_10px_#c4776630]"
+      {/*
+        장식 — 흰 동그라미 배지를 걷어내고 연한 하트를 배경처럼 깔았다.
+        상자만 또렷하고 나머지는 뒤로 물러나 있어야 인사말이 먼저 읽힌다.
+      */}
+      <div className="relative mr-[30px] hidden size-[190px] place-items-center lg:grid">
+        {/* 경계를 흐려 배경에 스며들게 한다 — 또렷한 원이면 상자보다 먼저 눈에 걸린다 */}
+        <span className="absolute -inset-3 rounded-[48%_52%_55%_45%] bg-[#f6e3dc] blur-2xl" />
+
+        <Heart
+          size={56}
+          fill="currentColor"
+          strokeWidth={0}
+          className="absolute top-1 right-2 rotate-[14deg] text-[#f0cabe] blur-[1px]"
         />
-        <div className="absolute top-[18px] -right-1.5 grid size-8 place-items-center rounded-full bg-white text-coral shadow-[0_8px_20px_#6d4e4518]">
-          ♥
-        </div>
-        <div className="absolute bottom-3.5 -left-[5px] grid size-8 place-items-center rounded-full bg-white text-[#789482] shadow-[0_8px_20px_#6d4e4518]">
-          ✦
-        </div>
+        <Heart
+          size={30}
+          fill="currentColor"
+          strokeWidth={0}
+          className="absolute bottom-4 left-1 -rotate-[10deg] text-[#f4d7cd] blur-[2px]"
+        />
+
+        <Gift3dIcon
+          width={128}
+          height={128}
+          className="relative drop-shadow-[0_14px_20px_#c477661f]"
+        />
       </div>
     </section>
   );
