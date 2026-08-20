@@ -38,7 +38,8 @@ export const KIND_TABS = [
     categoryLabel: '행사 이름',
     // 경조사에서 이 칸에 들어가는 값은 조의금·축의금이라 '선물'로 부르면 어색하다.
     giftLabel: '받은 마음',
-    giftPlaceholder: '축의금',
+    // 경사·조사를 고르면 축의금·조의금이 채워지므로 안내 문구가 필요 없다.
+    giftPlaceholder: '',
     pricePlaceholder: '100,000',
     // 행사 이름이 곧 사유라 '받은 이유'는 겹친다.
     showOccasion: false,
@@ -63,6 +64,12 @@ export const GIFT_CATEGORY_ADD = {
   nameLabel: '카테고리 이름',
   placeholder: '디저트',
 } as const satisfies { kind: KindT; title: string; nameLabel: string; placeholder: string };
+
+/** 경조사는 대부분 축의금·조의금이라 분류를 고르면 미리 채워 준다. */
+export const EVENT_GIFT_DEFAULTS = {
+  CELEBRATION: '축의금',
+  CONDOLENCE: '조의금',
+} as const;
 
 export type KindTabT = (typeof KIND_TABS)[number]['key'];
 

@@ -17,7 +17,12 @@ import AmountInput from './AmountInput';
 import CategoryPicker from './CategoryPicker';
 import EventFields from './EventFields';
 import PersonPicker from './PersonPicker';
-import { GIFT_CATEGORY_ADD, KIND_TABS, recordFormSchema } from './recordModal.const';
+import {
+  EVENT_GIFT_DEFAULTS,
+  GIFT_CATEGORY_ADD,
+  KIND_TABS,
+  recordFormSchema,
+} from './recordModal.const';
 import type { KindTabT, RecordFormT } from './recordModal.const';
 
 const fieldClass =
@@ -76,8 +81,25 @@ function ConfirmStep({
   const tab = KIND_TABS.find(item => item.key === kind) ?? KIND_TABS[0];
   const categories = kind === 'EVENT' ? eventCategories : giftCategories;
 
+  /** 자동으로 채워 둔 값인지 — 직접 적은 값은 건드리지 않기 위해 구분한다. */
+  const isAutoFilledGift = () =>
+    Object.values(EVENT_GIFT_DEFAULTS).some(item => item === getValues('gift').trim());
+
+  const fillEventGift = (nextKind: keyof typeof EVENT_GIFT_DEFAULTS) => {
+    if (!getValues('gift').trim() || isAutoFilledGift()) {
+      setValue('gift', EVENT_GIFT_DEFAULTS[nextKind]);
+    }
+  };
+
   const handlePickKind = (next: KindTabT) => {
     setPickedKind(next);
+
+    if (next === 'EVENT') {
+      fillEventGift(getValues('eventKind'));
+    } else if (isAutoFilledGift()) {
+      // 선물 탭에 축의금·조의금이 남아 있으면 안 된다.
+      setValue('gift', '');
+    }
 
     // 다른 탭에는 없는 카테고리가 남아 있으면 비운다.
     const nextCategories = next === 'EVENT' ? eventCategories : giftCategories;
@@ -166,7 +188,10 @@ function ConfirmStep({
         {tab.isEvent ? (
           <EventFields
             kindValue={eventKind}
-            onKindChange={next => setValue('eventKind', next)}
+            onKindChange={next => {
+              setValue('eventKind', next);
+              fillEventGift(next);
+            }}
             nameValue={category}
             onNameChange={name => setValue('category', name)}
             events={eventCategories}
