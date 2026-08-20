@@ -26,15 +26,18 @@ function StatCard({ icon: Icon, label, value, detail, tone, href }: StatCardProp
       </div>
       {/* 부연은 오른쪽 아래 — 숫자의 아랫선에 맞춰 따로 떠 보이지 않게 한다 */}
       <div className="sm:flex sm:flex-1 sm:items-end sm:justify-between sm:gap-2">
-        <div className="min-w-0">
-          <span className="mt-2 block text-[11px] font-bold text-[#6f6a63] sm:mt-0">{label}</span>
-          <strong className="mt-[3px] block font-title font-bold text-[19px] sm:text-2xl">
+        {/* 이름표와 숫자는 줄바꿈하지 않는다 — 좁은 칸에서 '다가오는 / 일정' 으로 쪼개졌다 */}
+        <div className="shrink-0">
+          <span className="mt-2 block text-[11px] font-bold whitespace-nowrap text-[#6f6a63] sm:mt-0">
+            {label}
+          </span>
+          <strong className="mt-[3px] block font-title font-bold text-[19px] whitespace-nowrap sm:text-2xl">
             {value}
           </strong>
         </div>
-        {/* 기록이 없으면 '이번 달 +0' 같은 문구가 오히려 허전해 보인다 */}
+        {/* 자리가 모자라면 부연이 먼저 줄어든다 — 숫자를 밀어내면 안 된다 */}
         {detail ? (
-          <small className="hidden shrink-0 pb-1 text-[10px] text-[#a49f97] sm:block">
+          <small className="hidden min-w-0 truncate pb-1 text-[10px] text-[#a49f97] sm:block">
             {detail}
           </small>
         ) : null}
