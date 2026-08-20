@@ -65,7 +65,6 @@ function ConfirmStep({
   const category = useWatch({ control, name: 'category' });
   const relation = useWatch({ control, name: 'relation' });
   const eventCategory = useWatch({ control, name: 'eventCategory' });
-  const eventGroup = useWatch({ control, name: 'eventGroup' });
   const eventDate = useWatch({ control, name: 'eventDate' });
   const price = useWatch({ control, name: 'price' });
   const date = useWatch({ control, name: 'date' });
@@ -140,13 +139,6 @@ function ConfirmStep({
         {/* 경조사는 한 행사에 여러 명을 기록하므로 행사를 맨 먼저 정한다. */}
         {tab.isEvent ? (
           <EventFields
-            groupValue={eventGroup}
-            onGroupChange={next => {
-              setValue('eventGroup', next);
-              fillEventGift(next);
-              // 고른 유형이 다른 그룹 것이면 어긋나므로 비운다.
-              setValue('eventCategory', '');
-            }}
             categoryValue={eventCategory}
             onPick={picked => {
               setValue('eventCategory', picked.label);

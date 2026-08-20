@@ -1,20 +1,13 @@
 'use client';
 
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-import ChoiceButton from '@/components/common/choice-button';
 import DatePicker from '@/components/common/date-picker';
 import { useGetEventCategories } from '@/hooks/useGetEventCategories';
-import type { EventCategoryT, EventGroupT } from '@/types/eventCategory';
-
-const EVENT_GROUPS = [
-  { key: 'CELEBRATION', label: '경사' },
-  { key: 'CONDOLENCE', label: '조사' },
-] as const satisfies readonly { key: EventGroupT; label: string }[];
+import type { EventCategoryT } from '@/types/eventCategory';
 
 type EventFieldsProps = {
-  groupValue: EventGroupT;
-  onGroupChange: (group: EventGroupT) => void;
   /** 고른 경조사 유형. 서버가 기록에 한글 라벨로 돌려주므로 라벨로 들고 있는다 */
   categoryValue: string;
   /** 유형을 고르면 그 유형과 속한 그룹을 함께 알린다 */
@@ -28,11 +21,9 @@ type EventFieldsProps = {
 
 /**
  * 경조사는 서버가 정한 고정 7종 중에서 고른다 — 이름을 직접 만들지 않는다.
- * 경사·조사 버튼은 그 아래 유형 목록을 좁히는 역할이다.
+ * 경사·조사는 따로 고르지 않는다. 목록에서 묶어 보여주고, 고른 유형에서 따라간다.
  */
 function EventFields({
-  groupValue,
-  onGroupChange,
   categoryValue,
   onPick,
   dateValue,
@@ -54,7 +45,17 @@ function EventFields({
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, []);
 
-  const options = eventCategories.filter(option => option.group === groupValue);
+  // 서버가 경사 → 조사 순으로 내려주므로 순서를 지키며 묶기만 한다.
+  const groups = eventCategories.reduce<
+    { key: string; label: string; options: EventCategoryT[] }[]
+  >((acc, option) => {
+    const group = acc.find(item => item.key === option.group);
+    if (group) group.options.push(option);
+    else acc.push({ key: option.group, label: option.groupLabel, options: [option] });
+
+    return acc;
+  }, []);
+
   // AI 초안은 라벨로, 직접 고르면 라벨로 들어온다 — 코드로 온 값도 받아 준다.
   const picked = eventCategories.find(
     option => option.label === categoryValue || option.name === categoryValue
@@ -82,29 +83,37 @@ function EventFields({
             {picked ? (
               <>
                 <span className="shrink-0">{picked.emoji}</span>
-                <span className="truncate">{picked.label}</span>
+                <span className="min-w-0 flex-1 truncate">{picked.label}</span>
               </>
             ) : (
-              '선택'
+              <span className="min-w-0 flex-1 truncate">선택</span>
             )}
+            <ChevronDown size={13} className="shrink-0 text-subtle" />
           </button>
 
           {isOpen ? (
-            <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
-              {options.map(option => (
-                <li key={option.name}>
-                  <button
-                    type="button"
-                    onClick={() => handlePick(option)}
-                    className={`flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream ${
-                      option.name === picked?.name ? 'bg-cream font-bold text-coral-deep' : ''
-                    }`}
-                  >
-                    <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f4efe9] text-[11px]">
-                      {option.emoji}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate">{option.label}</span>
-                  </button>
+            <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[268px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
+              {groups.map(group => (
+                <li key={group.key}>
+                  <p className="px-2 pt-1.5 pb-1 text-[9px] font-bold text-subtle">{group.label}</p>
+                  <ul>
+                    {group.options.map(option => (
+                      <li key={option.name}>
+                        <button
+                          type="button"
+                          onClick={() => handlePick(option)}
+                          className={`flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream ${
+                            option.name === picked?.name ? 'bg-cream font-bold text-coral-deep' : ''
+                          }`}
+                        >
+                          <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f4efe9] text-[11px]">
+                            {option.emoji}
+                          </span>
+                          <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>
@@ -113,22 +122,6 @@ function EventFields({
       </div>
 
       <div className={labelClass}>
-        <span className={labelTextClass}>경사·조사</span>
-        <div className="flex gap-1.5">
-          {EVENT_GROUPS.map(option => (
-            <ChoiceButton
-              key={option.key}
-              selected={groupValue === option.key}
-              onClick={() => onGroupChange(option.key)}
-              className="h-9 flex-1"
-            >
-              {option.label}
-            </ChoiceButton>
-          ))}
-        </div>
-      </div>
-
-      <div className={`${labelClass} col-span-2`}>
         <span className={labelTextClass}>행사 날짜</span>
         <DatePicker
           value={dateValue}
