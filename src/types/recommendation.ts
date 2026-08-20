@@ -11,6 +11,8 @@ export type RecommendedGiftT = {
   reason: string;
   /** 실제 상품 구매 링크. AI가 상품을 찾지 못하면 null — 있을 때만 링크로 만든다 */
   productUrl: string | null;
+  /** 상품 대표 이미지. productUrl 페이지의 og:image 라 링크가 없으면 함께 null — 없으면 이모지로 그린다 */
+  imageUrl: string | null;
   thankYouMessage: string | null;
 };
 
