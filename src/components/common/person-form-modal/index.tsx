@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 
-import { ApiError } from '@/apis/apiClient';
+import { ApiError, toFieldMessages } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import ChoiceButton from '@/components/common/choice-button';
 import DatePicker from '@/components/common/date-picker';
+import FieldLabel from '@/components/common/field-label';
+import FieldMessage from '@/components/common/field-label/FieldMessage';
 import Modal from '@/components/common/modal';
 import RelationPicker from '@/components/common/relation-picker';
 import { useAppUi } from '@/hooks/useAppUi';
@@ -38,17 +40,28 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
   const [memo, setMemo] = useState(person?.memo ?? '');
   /** 관계 추가 모달이 떠 있는 동안은 이 모달을 감춘다 (값은 유지) */
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+  /** 서버가 짚어 준 칸별 안내 문구 */
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // 서버가 막는 값이라 채우기 전에는 저장 버튼을 열지 않는다.
+  const isFilled = Boolean(name.trim() && relation.trim() && gender);
   const isEdit = Boolean(person);
   const isPending = isPostPersonPending || isPatchPersonPending;
   const submitLabel = isEdit ? '수정하기' : '등록하기';
 
-  const handleError = (error: unknown) =>
+  const handleError = (error: unknown) => {
+    // 어느 칸이 잘못됐는지 서버가 알려주면 토스트 대신 그 칸 아래에 띄운다.
+    const messages = toFieldMessages(error);
+    setFieldErrors(messages);
+
+    if (Object.keys(messages).length > 0) return;
+
     showToast(error instanceof ApiError ? error.message : '잠시 후 다시 시도해주세요.');
+  };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!name.trim()) return;
+    setFieldErrors({});
 
     const body = {
       name: name.trim(),
@@ -78,22 +91,27 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
         {isEdit ? '정보 수정' : '사람 등록'}
       </h2>
       <p className="mb-5 text-[11px] leading-[1.7] text-[#8e8880]">
-        생일과 성별을 넣어두면 홈 화면 에이전트 카드와 선물 추천에 반영돼요.
+        생일까지 넣어두면 홈 화면 에이전트 카드와 선물 추천에 반영돼요.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <label className={labelClass}>
-          <span className={labelTextClass}>이름</span>
+          <FieldLabel required className={labelTextClass}>
+            이름
+          </FieldLabel>
           <input
             value={name}
             onChange={event => setName(event.target.value)}
             placeholder="김민수"
             className={fieldClass}
           />
+          <FieldMessage message={fieldErrors.name} />
         </label>
 
         <div className={labelClass}>
-          <span className={labelTextClass}>관계</span>
+          <FieldLabel required className={labelTextClass}>
+            관계
+          </FieldLabel>
           <RelationPicker
             value={relation}
             onChange={setRelation}
@@ -101,10 +119,13 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
             addButtonSize="lg"
             className={fieldClass}
           />
+          <FieldMessage message={fieldErrors.relation} />
         </div>
 
         <div className={labelClass}>
-          <span className={labelTextClass}>성별</span>
+          <FieldLabel required className={labelTextClass}>
+            성별
+          </FieldLabel>
           <div className="flex gap-1.5">
             {GENDER_OPTIONS.map(option => (
               <ChoiceButton
@@ -118,6 +139,7 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
               </ChoiceButton>
             ))}
           </div>
+          <FieldMessage message={fieldErrors.gender} />
         </div>
 
         <div className={labelClass}>
@@ -145,7 +167,7 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
           <Button variant="ghost" full onClick={onClose} disabled={isPending}>
             취소
           </Button>
-          <Button type="submit" full disabled={isPending || !name.trim()}>
+          <Button type="submit" full disabled={isPending || !isFilled}>
             {isPending ? '저장 중…' : submitLabel}
           </Button>
         </div>
