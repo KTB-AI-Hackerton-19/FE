@@ -1,5 +1,5 @@
 import { API, API_BASE_URL } from '@/consts/api';
-import type { ApiResponseT } from '@/types/api';
+import type { ApiResponseT, FieldErrorT } from '@/types/api';
 import type { TokenT } from '@/types/auth';
 import {
   clearTokens,
@@ -12,14 +12,24 @@ import {
 export class ApiError extends Error {
   code: string;
   status: number;
+  /** 어느 칸이 잘못됐는지 (INVALID_INPUT 일 때만). 칸 아래 안내 문구로 쓴다 */
+  fields: FieldErrorT[];
 
-  constructor(code: string, message: string, status: number) {
+  constructor(code: string, message: string, status: number, fields: FieldErrorT[] = []) {
     super(message);
     this.name = 'ApiError';
     this.code = code;
     this.status = status;
+    this.fields = fields;
   }
 }
+
+/** 서버가 짚어 준 칸별 문구를 { 칸이름: 문구 } 로 바꾼다. */
+export const toFieldMessages = (error: unknown) => {
+  if (!(error instanceof ApiError)) return {};
+
+  return Object.fromEntries(error.fields.map(({ field, message }) => [field, message]));
+};
 
 type RequestOptionsT = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
@@ -114,7 +124,8 @@ export const request = async <T>(path: string, options: RequestOptionsT = {}): P
     throw new ApiError(
       error?.code ?? 'UNKNOWN',
       error?.message ?? '요청을 처리하지 못했어요.',
-      response.status
+      response.status,
+      error?.fields ?? []
     );
   }
 
