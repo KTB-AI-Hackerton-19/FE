@@ -1,6 +1,6 @@
 import { Heart, Sparkles } from 'lucide-react';
 
-import GiftBoxIcon from '@/assets/icons/GiftBoxIcon';
+import GiftBoxIcon from '@/assets/icons/gift-box.svg';
 
 /** 로그인 화면 왼쪽의 브랜드 면. 좁은 화면에서는 자리를 차지하지 않고 숨는다. */
 function BrandPanel() {
@@ -9,7 +9,8 @@ function BrandPanel() {
       {/* 배경 장식 — 로고와 문구 사이 빈 자리를 선물상자와 하트로 옅게 채운다 */}
       <div className="pointer-events-none absolute inset-0 text-white" aria-hidden="true">
         <GiftBoxIcon
-          size={250}
+          width={250}
+          height={250}
           className="absolute top-[30%] left-[10%] -rotate-[9deg] opacity-45"
         />
         <Heart

@@ -1,6 +1,6 @@
 'use client';
 
-import SadGiftIcon from '@/assets/icons/SadGiftIcon';
+import SadGiftIcon from '@/assets/icons/sad-gift.svg';
 import Button from '@/components/common/button';
 
 type EmptyStateProps = {
@@ -15,7 +15,7 @@ function EmptyState({ title, description, actionLabel, onAction }: EmptyStatePro
   return (
     <div className="px-6 py-12 text-center">
       <div className="mx-auto grid size-16 place-items-center rounded-[20px] bg-coral-soft text-coral-deep">
-        <SadGiftIcon size={38} />
+        <SadGiftIcon width={38} height={38} />
       </div>
 
       <p className="mt-4 text-[13px] font-bold">{title}</p>
