@@ -22,6 +22,7 @@ function StatsGrid({ className = '' }: StatsGridProps) {
         value={stats?.totalRecordsText ?? '—'}
         detail={stats?.recordsThisMonthText ?? ''}
         tone="coral"
+        href="/records"
       />
       <StatCard
         icon={Users}
@@ -29,6 +30,7 @@ function StatsGrid({ className = '' }: StatsGridProps) {
         value={stats?.totalPeopleText ?? '—'}
         detail="꾸준히 이어가는 중"
         tone="mint"
+        href="/people"
       />
       <StatCard
         icon={CalendarDays}
@@ -36,6 +38,7 @@ function StatsGrid({ className = '' }: StatsGridProps) {
         value={stats?.upcomingRemindersText ?? '—'}
         detail={stats?.nearestReminderText ?? ''}
         tone="blue"
+        href="/calendar"
       />
     </section>
   );

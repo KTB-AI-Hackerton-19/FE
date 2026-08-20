@@ -1,4 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
+import type { Route } from 'next';
+import Link from 'next/link';
 
 import { statIconStyles } from './statCard.style';
 
@@ -8,11 +10,16 @@ type StatCardProps = {
   value: string;
   detail: string;
   tone: 'coral' | 'mint' | 'blue';
+  /** 이 숫자를 자세히 볼 수 있는 화면 */
+  href: Route;
 };
 
-function StatCard({ icon: Icon, label, value, detail, tone }: StatCardProps) {
+function StatCard({ icon: Icon, label, value, detail, tone, href }: StatCardProps) {
   return (
-    <article className="rounded-[15px] border border-line bg-white p-3 sm:flex sm:items-center sm:gap-3.5 sm:p-[19px]">
+    <Link
+      href={href}
+      className="rounded-[15px] border border-line bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-[0_10px_24px_#503e3512] sm:flex sm:items-center sm:gap-3.5 sm:p-[19px]"
+    >
       <div className={statIconStyles({ tone })}>
         <Icon size={21} />
       </div>
@@ -25,7 +32,7 @@ function StatCard({ icon: Icon, label, value, detail, tone }: StatCardProps) {
           {detail}
         </small>
       </div>
-    </article>
+    </Link>
   );
 }
 
