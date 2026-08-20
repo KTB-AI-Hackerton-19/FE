@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Plus } from 'lucide-react';
+import { ChevronRight, Plus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -92,7 +92,13 @@ function PeopleList() {
           onDelete={() => setIsConfirmOpen(true)}
           onCancel={exitSelecting}
           className="mb-3"
-          leading={<b className="min-w-0 truncate text-[11px]">{peopleTotal}명</b>}
+          leading={
+            // 사이드바의 '사람들' 아이콘과 같은 것을 써서 어느 목록의 건수인지 바로 보이게 한다.
+            <b className="flex min-w-0 items-center gap-1.5 truncate text-[11px]">
+              <Users size={13} className="shrink-0 text-subtle" />
+              {peopleTotal}명
+            </b>
+          }
           trailing={
             <Button size="xs" onClick={() => setIsFormOpen(true)}>
               <Plus size={13} /> 사람 등록

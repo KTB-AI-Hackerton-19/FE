@@ -1,6 +1,6 @@
 'use client';
 
-import { Settings2 } from 'lucide-react';
+import { Gift, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
@@ -91,7 +91,12 @@ function GiftRecordList() {
         onToggleAll={handleToggleAll}
         onDelete={selection.openConfirm}
         onCancel={selection.cancel}
-        leading={<b className="min-w-0 truncate">{giftRecordsTotal}개의 마음</b>}
+        leading={
+          <b className="flex min-w-0 items-center gap-1.5 truncate">
+            <Gift size={13} className="shrink-0 text-subtle" />
+            {giftRecordsTotal}개의 마음
+          </b>
+        }
         trailing={<SortToggle value={sort} onChange={setSort} />}
         className="my-[25px] mb-[11px]"
       />
