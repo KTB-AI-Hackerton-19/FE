@@ -139,7 +139,7 @@ function PeopleList() {
                   {/* '마음 4개'보다 아이콘에 숫자만 붙이는 편이 한눈에 읽힌다 */}
                   <span className="flex shrink-0 items-center gap-0.5 text-[10px] font-bold text-[#c98878]">
                     <Gift size={12} strokeWidth={2.4} />
-                    {person.giftCount}
+                    {person.giftCount}개
                   </span>
                 </div>
                 {person.latestGift ? (
