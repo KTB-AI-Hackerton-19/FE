@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import Modal from '@/components/common/modal';
+import RelationPicker from '@/components/common/relation-picker';
 import { useAppUi } from '@/hooks/useAppUi';
 import { usePatchPerson, usePostPerson } from '@/hooks/usePeopleMutations';
 import { GENDER_OPTIONS } from '@/types/person';
@@ -33,6 +34,8 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
   const [gender, setGender] = useState<GenderT | null>(person?.gender ?? null);
   const [birthday, setBirthday] = useState(person?.birthday ?? '');
   const [memo, setMemo] = useState(person?.memo ?? '');
+  /** 관계 추가 모달이 떠 있는 동안은 이 모달을 감춘다 (값은 유지) */
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 
   const isEdit = Boolean(person);
   const isPending = isPostPersonPending || isPatchPersonPending;
@@ -68,7 +71,7 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} hidden={isSubModalOpen}>
       <h2 className="mb-1.5 font-title font-bold text-[21px]">
         {isEdit ? '정보 수정' : '사람 등록'}
       </h2>
@@ -87,15 +90,15 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
           />
         </label>
 
-        <label className={labelClass}>
+        <div className={labelClass}>
           <span className={labelTextClass}>관계</span>
-          <input
+          <RelationPicker
             value={relation}
-            onChange={event => setRelation(event.target.value)}
-            placeholder="친한 친구"
+            onChange={setRelation}
+            onSubModalToggle={setIsSubModalOpen}
             className={fieldClass}
           />
-        </label>
+        </div>
 
         <div className={labelClass}>
           <span className={labelTextClass}>성별</span>

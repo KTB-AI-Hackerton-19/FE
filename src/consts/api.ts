@@ -22,6 +22,7 @@ export const API = {
   PRESIGNED_URL: '/api/gift-assets/presigned-url',
 
   PEOPLE: '/api/people',
+  RELATIONSHIPS: '/api/relationships',
   PERSON: (id: number) => `/api/people/${id}`,
   PERSON_GIFT_RECORDS: (id: number) => `/api/people/${id}/gift-records`,
 
@@ -40,6 +41,7 @@ export const QUERY_KEY = {
   CATEGORIES: ['categories'],
   GIFT_RECORDS: ['gift-records'],
   PEOPLE: ['people'],
+  RELATIONSHIPS: ['relationships'],
   PERSON: (id: number) => ['people', id],
   CALENDAR: (year: number, month: number) => ['calendar', year, month],
   GOOGLE_INTEGRATION: ['google-integration'],

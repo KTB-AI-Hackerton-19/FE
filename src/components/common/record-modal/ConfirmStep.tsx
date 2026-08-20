@@ -8,6 +8,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import DatePicker from '@/components/common/date-picker';
+import RelationPicker from '@/components/common/relation-picker';
 import { useAppUi } from '@/hooks/useAppUi';
 import { usePostCategory } from '@/hooks/useCategoryMutations';
 import { useGetCategories } from '@/hooks/useGetCategories';
@@ -63,6 +64,7 @@ function ConfirmStep({
 
   const personName = useWatch({ control, name: 'personName' });
   const category = useWatch({ control, name: 'category' });
+  const relation = useWatch({ control, name: 'relation' });
   const eventKind = useWatch({ control, name: 'eventKind' });
   const price = useWatch({ control, name: 'price' });
   const date = useWatch({ control, name: 'date' });
@@ -221,10 +223,15 @@ function ConfirmStep({
             className={fieldClass}
           />
         </div>
-        <label className={labelClass}>
+        <div className={labelClass}>
           <span className={labelTextClass}>관계</span>
-          <input className={fieldClass} {...register('relation')} />
-        </label>
+          <RelationPicker
+            value={relation}
+            onChange={next => setValue('relation', next)}
+            onSubModalToggle={onSubModalToggle}
+            className={fieldClass}
+          />
+        </div>
         <div className={tab.showOccasion ? labelClass : `${labelClass} col-span-2`}>
           <span className={labelTextClass}>받은 날짜</span>
           <DatePicker
