@@ -36,7 +36,10 @@ function GiftCard({ gift, index }: GiftCardProps) {
       <div className="p-[15px]">
         <h3 className="mb-[3px] text-[13px]">{gift.name}</h3>
         <strong className="text-xs text-[#dc725f]">{gift.price}</strong>
-        <p className="h-[29px] text-[9px] leading-[1.55] text-[#8e8981]">{gift.reason}</p>
+        {/* 이유 길이가 제각각이라 두 줄로 자른다 — 카드 높이가 들쭉날쭉하면 줄이 어긋난다. */}
+        <p className="line-clamp-2 h-[29px] text-[9px] leading-[1.55] text-[#8e8981]">
+          {gift.reason}
+        </p>
         {/* 구매 링크는 AI가 상품을 찾았을 때만 내려온다 */}
         {gift.productUrl ? (
           <a
