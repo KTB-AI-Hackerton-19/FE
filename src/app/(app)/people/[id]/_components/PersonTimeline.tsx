@@ -95,8 +95,8 @@ function PersonTimeline({ id }: PersonTimelineProps) {
                 </span>
               ) : null}
               {/* 목록 카드와 같은 표시 — 선물 아이콘에 개수만 붙인다 */}
-              <span className="flex items-center gap-1 text-[13px] font-extrabold text-[#c98878]">
-                <Gift size={15} strokeWidth={2.6} />
+              <span className="flex items-center gap-0.5 text-[11px] font-bold text-[#c98878]">
+                <Gift size={13} strokeWidth={2.4} />
                 받은 마음 {personData.person.giftCount}개
               </span>
             </div>
@@ -104,12 +104,12 @@ function PersonTimeline({ id }: PersonTimelineProps) {
 
           <div className="my-3 mb-7 grid grid-cols-2 rounded-2xl bg-coral-soft px-1.5 py-3.5 text-coral-deep sm:p-[17px]">
             <div className="flex flex-col items-center gap-[5px]">
-              <span className="text-[9px] text-[#c59283]">최근 받은 날</span>
-              <b className="text-xs">{formatDate(personData.person.latestReceivedDate)}</b>
+              <span className="text-[10px] text-[#c59283]">최근 받은 날</span>
+              <b className="text-[15px]">{formatDate(personData.person.latestReceivedDate)}</b>
             </div>
             <div className="flex flex-col items-center gap-[5px] border-l border-[#eec9bd]">
-              <span className="text-[9px] text-[#c59283]">다가오는 알림</span>
-              <b className="text-xs">{formatDate(personData.person.upcomingReminderDate)}</b>
+              <span className="text-[10px] text-[#c59283]">다가오는 알림</span>
+              <b className="text-[15px]">{formatDate(personData.person.upcomingReminderDate)}</b>
             </div>
           </div>
 
