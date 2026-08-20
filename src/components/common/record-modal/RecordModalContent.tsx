@@ -187,7 +187,8 @@ function RecordModalContent() {
       }`}
       onMouseDown={event => event.target === event.currentTarget && handleClose()}
     >
-      <div className="relative max-h-[92vh] w-full overflow-auto rounded-t-[23px] bg-[#fffdfa] px-[19px] pt-[27px] pb-[30px] shadow-[0_25px_70px_#1b171345] sm:max-w-[480px] sm:rounded-[22px] sm:p-[34px]">
+      {/* 버튼을 고정하려면 스크롤을 패널이 아니라 안쪽 폼이 맡아야 한다. */}
+      <div className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[23px] bg-[#fffdfa] px-[19px] pt-[27px] pb-[30px] shadow-[0_25px_70px_#1b171345] sm:max-w-[480px] sm:rounded-[22px] sm:p-[34px]">
         <button
           type="button"
           onClick={handleClose}
