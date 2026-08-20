@@ -115,13 +115,19 @@ function RecordRows({
                 {record.emoji}
               </div>
 
-              {/* 홈 카드와 같은 짜임 — 날짜는 첫 줄 오른쪽, 답례 뱃지는 마지막 줄 오른쪽 */}
+              {/*
+                받은 이유는 목록에서 빼 둔다 — 첫 줄에 작은 정보를 모으고
+                오른쪽은 금액만 남겨야 눈이 한 번에 읽는다.
+              */}
               <div className={`relative min-w-0 flex-1 ${contentClass}`}>
-                <div className="flex items-center justify-between gap-2 text-[9px] text-subtle">
-                  <span className="truncate font-bold text-[#dc725f]">{record.occasion}</span>
+                <div className="flex min-w-0 items-center gap-1.5 text-[9px] text-subtle">
                   <time dateTime={record.date} className="shrink-0">
                     {formatDate(record.date)}
                   </time>
+                  {/* 고르는 중에는 뱃지가 클릭을 가로채지 않게 둔다 — 행 전체가 선택 버튼이다. */}
+                  <div className={`-my-1 ${isSelecting ? 'pointer-events-none' : ''}`}>
+                    <ThankedBadge id={record.id} thanked={record.thanked} stopPropagation />
+                  </div>
                 </div>
                 <div className="my-[3px] flex min-w-0 items-center gap-1.5">
                   <h3 className="min-w-0 truncate text-sm">{record.person}</h3>
@@ -131,13 +137,7 @@ function RecordRows({
                     </span>
                   ) : null}
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="min-w-0 truncate text-[11px] text-[#716b64]">{record.gift}</p>
-                  {/* 고르는 중에는 뱃지가 클릭을 가로채지 않게 둔다 — 행 전체가 선택 버튼이다. */}
-                  <div className={`shrink-0 ${isSelecting ? 'pointer-events-none' : ''}`}>
-                    <ThankedBadge id={record.id} thanked={record.thanked} stopPropagation />
-                  </div>
-                </div>
+                <p className="truncate text-[11px] text-[#716b64]">{record.gift}</p>
               </div>
 
               <div className={`relative flex items-center gap-1.5 ${contentClass}`}>
