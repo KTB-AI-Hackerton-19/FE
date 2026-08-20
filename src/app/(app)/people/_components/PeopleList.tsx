@@ -94,8 +94,8 @@ function PeopleList() {
           className="mb-3"
           leading={<b className="min-w-0 truncate text-[11px]">{peopleTotal}명</b>}
           trailing={
-            <Button size="sm" onClick={() => setIsFormOpen(true)}>
-              <Plus size={15} /> 사람 등록
+            <Button size="xs" onClick={() => setIsFormOpen(true)}>
+              <Plus size={13} /> 사람 등록
             </Button>
           }
         />

@@ -61,7 +61,13 @@ function RecommendSection() {
           ) : null
         }
         action={
-          <Button variant="text" size="xs" onClick={handleRefresh} disabled={isRefreshing}>
+          <Button
+            variant="text"
+            size="xs"
+            className="px-0 py-0"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
             {isRefreshing ? '준비 중…' : '다시 추천받기'}
           </Button>
         }
