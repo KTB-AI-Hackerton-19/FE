@@ -7,12 +7,12 @@ import { useState } from 'react';
 import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import PersonFormModal from '@/components/common/person-form-modal';
 import InfiniteScrollSentinel from '@/components/common/infinite-scroll-sentinel';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetPeople } from '@/hooks/useGetPeople';
 import { useDeletePeople } from '@/hooks/usePeopleMutations';
 
-import PersonFormModal from './PersonFormModal';
 
 const AVATAR_TONES = [
   'bg-[#f5e3dd] text-[#b86152]',
