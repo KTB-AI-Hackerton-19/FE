@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
   deleteGiftRecord,
+  deleteGiftRecords,
   patchGiftRecord,
   patchGiftRecordThanked,
   postGiftRecord,
@@ -84,4 +85,15 @@ export const useDeleteGiftRecord = () => {
   });
 
   return { deleteGiftRecordMutation, isDeleteGiftRecordPending };
+};
+
+export const useDeleteGiftRecords = () => {
+  const invalidate = useInvalidateRecords();
+
+  const { mutate: deleteGiftRecordsMutation, isPending: isDeleteGiftRecordsPending } = useMutation({
+    mutationFn: deleteGiftRecords,
+    onSuccess: invalidate,
+  });
+
+  return { deleteGiftRecordsMutation, isDeleteGiftRecordsPending };
 };

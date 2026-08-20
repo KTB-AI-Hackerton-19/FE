@@ -56,3 +56,13 @@ export const postGiftRecordExtract = (body: PostGiftRecordExtractRequestT) =>
 
 /** 기록과 연결된 답례 알림을 함께 삭제한다. */
 export const deleteGiftRecord = (id: number) => apiClient.delete<void>(API.GIFT_RECORD(id));
+
+export type DeleteGiftRecordsResponseT = {
+  /** 실제로 지워진 수. 없는 id 나 남의 기록은 세지 않으므로 안내 문구에 그대로 쓴다 */
+  deletedRecords: number;
+  deletedReminders: number;
+};
+
+/** 여러 건을 한 번에 삭제한다. 보낸 사람은 지우지 않는다. */
+export const deleteGiftRecords = (ids: number[]) =>
+  apiClient.delete<DeleteGiftRecordsResponseT>(API.GIFT_RECORDS, { ids: ids.join(',') });

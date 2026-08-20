@@ -126,5 +126,6 @@ export const apiClient = {
   post: <T>(path: string, body?: unknown, options?: Omit<RequestOptionsT, 'method' | 'body'>) =>
     request<T>(path, { ...options, method: 'POST', body }),
   patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
-  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  delete: <T>(path: string, query?: RequestOptionsT['query']) =>
+    request<T>(path, { method: 'DELETE', query }),
 };
