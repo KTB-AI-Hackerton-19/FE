@@ -9,8 +9,10 @@ import { useGetDashboard } from '@/hooks/useGetDashboard';
 import {
   useDeleteGiftRecords,
   usePatchGiftRecord,
+  usePatchGiftRecordsBulk,
   usePostGiftRecord,
   usePostGiftRecordExtract,
+  usePostGiftRecordsBulk,
 } from '@/hooks/useGiftRecordMutations';
 import type { GiftRecordT } from '@/types/record';
 import { getTodayDateKey } from '@/utils/formatDate';
@@ -30,6 +32,8 @@ function RecordModalContent() {
   const { postGiftRecordExtractMutation } = usePostGiftRecordExtract();
   const { postGiftRecordMutation, isPostGiftRecordPending } = usePostGiftRecord();
   const { patchGiftRecordMutation, isPatchGiftRecordPending } = usePatchGiftRecord();
+  const { postGiftRecordsBulkMutation, isPostGiftRecordsBulkPending } = usePostGiftRecordsBulk();
+  const { patchGiftRecordsBulkMutation, isPatchGiftRecordsBulkPending } = usePatchGiftRecordsBulk();
   const { deleteGiftRecordsMutation } = useDeleteGiftRecords();
 
   const [step, setStep] = useState<ModalStepT>('upload');
@@ -39,7 +43,11 @@ function RecordModalContent() {
   /** AI 분석으로 만들어진 DRAFT 기록들. 직접 입력이면 빈 배열 */
   const [drafts, setDrafts] = useState<GiftRecordT[]>([]);
 
-  const isSaving = isPostGiftRecordPending || isPatchGiftRecordPending;
+  const isSaving =
+    isPostGiftRecordPending ||
+    isPatchGiftRecordPending ||
+    isPostGiftRecordsBulkPending ||
+    isPatchGiftRecordsBulkPending;
 
   const handleError = (error: unknown) =>
     showToast(error instanceof ApiError ? error.message : '잠시 후 다시 시도해주세요.');
@@ -102,7 +110,7 @@ function RecordModalContent() {
     };
 
     /**
-     * 여러 명은 사람마다 DRAFT 가 하나씩 있어 각각 확정한다.
+     * 여러 명은 사람마다 DRAFT 가 하나씩 있어 함께 확정한다.
      * 이름·금액·받은 날짜는 AI 값을 그대로 두고, 폼에서 함께 고른 값만 얹는다.
      */
     if (drafts.length > 1) {
@@ -117,22 +125,16 @@ function RecordModalContent() {
         ...shared
       } = body;
 
-      Promise.all(
-        drafts.map(
-          draft =>
-            new Promise<void>((resolve, reject) => {
-              patchGiftRecordMutation(
-                { id: draft.id, ...shared, confirm: true },
-                { onSuccess: () => resolve(), onError: reject }
-              );
-            })
-        )
-      )
-        .then(() => {
-          closeRecordModal();
-          showToast(`${drafts.length}명의 마음을 기록했어요`);
-        })
-        .catch(handleError);
+      patchGiftRecordsBulkMutation(
+        { ids: drafts.map(draft => draft.id), ...shared, confirm: true },
+        {
+          onSuccess: () => {
+            closeRecordModal();
+            showToast(`${drafts.length}명의 마음을 기록했어요`);
+          },
+          onError: handleError,
+        }
+      );
 
       return;
     }
@@ -147,31 +149,36 @@ function RecordModalContent() {
     }
 
     /**
-     * 경조사는 한 행사에 여러 명이 오므로 고른 사람 수만큼 기록을 만든다.
+     * 경조사는 한 행사에 여러 명이 오므로 고른 사람을 한 번에 등록한다.
      * 하객은 '사람들' 목록에 올리지 않는다 — 목록에서 고른 사람만 personId 로 연결한다.
      */
     if (isEvent && values.guests.length > 0) {
-      // 관계는 사람마다 다르다 — 등록된 사람의 관계를 덮어쓰지 않도록 아예 보내지 않는다.
-      const { personId: _personId, personName: _personName, relation: _relation, ...shared } = body;
+      // 관계는 사람마다 다르다 — 등록된 사람에게 보내면 그 사람의 관계가 덮어써진다.
+      const {
+        personId: _personId,
+        personName: _personName,
+        relation: pickedRelation,
+        price,
+        ...shared
+      } = body;
 
-      Promise.all(
-        values.guests.map(
-          guest =>
-            new Promise<void>((resolve, reject) => {
-              postGiftRecordMutation(
-                guest.personId
-                  ? { ...shared, personId: guest.personId }
-                  : { ...shared, guestName: guest.name },
-                { onSuccess: () => resolve(), onError: reject }
-              );
-            })
-        )
-      )
-        .then(() => {
-          closeRecordModal();
-          showToast(`${values.guests.length}명의 마음을 기록했어요`);
-        })
-        .catch(handleError);
+      postGiftRecordsBulkMutation(
+        {
+          ...shared,
+          guests: values.guests.map(guest =>
+            guest.personId
+              ? { personId: guest.personId, price }
+              : { guestName: guest.name, price, relation: pickedRelation }
+          ),
+        },
+        {
+          onSuccess: () => {
+            closeRecordModal();
+            showToast(`${values.guests.length}명의 마음을 기록했어요`);
+          },
+          onError: handleError,
+        }
+      );
 
       return;
     }

@@ -16,6 +16,7 @@ export const API = {
   CATEGORY: (id: number) => `/api/categories/${id}`,
 
   GIFT_RECORDS: '/api/gift-records',
+  GIFT_RECORDS_BULK: '/api/gift-records/bulk',
   GIFT_RECORD: (id: number) => `/api/gift-records/${id}`,
   GIFT_RECORD_THANKED: (id: number) => `/api/gift-records/${id}/thanked`,
   GIFT_RECORD_EXTRACT: '/api/gift-records/extract',
