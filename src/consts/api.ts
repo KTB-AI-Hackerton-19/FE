@@ -26,6 +26,7 @@ export const API = {
   EVENT_CATEGORIES: '/api/gift-records/event-categories',
   PERSON: (id: number) => `/api/people/${id}`,
   PERSON_GIFT_RECORDS: (id: number) => `/api/people/${id}/gift-records`,
+  PERSON_RECOMMENDATIONS: (id: number) => `/api/people/${id}/recommendations`,
 
   CALENDAR: '/api/calendar',
 
@@ -48,5 +49,6 @@ export const QUERY_KEY = {
   CALENDAR: (year: number, month: number) => ['calendar', year, month],
   GOOGLE_INTEGRATION: ['google-integration'],
   RECOMMENDATIONS: ['recommendations'],
+  PERSON_RECOMMENDATIONS: (id: number) => ['recommendations', 'person', id],
   SEARCH: (q: string) => ['search', q],
 } as const;

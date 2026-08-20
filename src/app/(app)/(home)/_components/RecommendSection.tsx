@@ -1,23 +1,18 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Lightbulb } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 
 import { getRecommendations } from '@/apis/getRecommendations';
 import Button from '@/components/common/button';
+import GiftCardList from '@/components/common/gift-card/GiftCardList';
 import SectionHeading from '@/components/common/section-heading';
+import ThankYouNote from '@/components/common/thank-you-note';
 import { QUERY_KEY } from '@/consts/api';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import type { RecommendationT } from '@/types/recommendation';
-
-import GiftThumbnail from './GiftThumbnail';
-
-const TONES = ['bg-[#e9f1ed]', 'bg-[#f5ede2]', 'bg-[#f7e9e7]'];
-
-const cardFooterClass =
-  'mt-2.5 flex w-full items-center justify-center gap-[5px] border-t border-line pt-[11px] text-[10px] font-bold';
 
 function RecommendSection() {
   const { dashboardData } = useGetDashboard();
@@ -32,6 +27,8 @@ function RecommendSection() {
   // 서버는 사람·일정 단위로 묶어 주는데, 카드는 한 줄로 늘어놓는다.
   const groups = refreshed ?? dashboardData?.recommendations ?? [];
   const items = groups.flatMap(group => group.gifts.map(gift => ({ group, gift })));
+  // 한 세트에 하나뿐이라 카드마다 같은 값이 들어 있다 — 아래에 한 번만 보여준다.
+  const thankYouMessage = items.find(({ gift }) => gift.thankYouMessage)?.gift.thankYouMessage;
 
   if (items.length === 0) return null;
 
@@ -54,7 +51,11 @@ function RecommendSection() {
       <SectionHeading
         id="recommendations"
         title="이런 선물은 어때요?"
-        description="관계와 지난 선물을 살펴 적당한 마음을 골랐어요."
+        description={
+          insight
+            ? `${insight.person}님의 관계와 마음 기록을 살펴 골랐어요.`
+            : '관계와 지난 선물을 살펴 적당한 마음을 골랐어요.'
+        }
         label={
           insight ? (
             <div className="mb-1.5 flex items-center gap-1 text-[10px] font-bold text-[#c88431]">
@@ -70,49 +71,14 @@ function RecommendSection() {
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            {isRefreshing ? '준비 중…' : '다시 추천받기'}
+            {isRefreshing ? '새로 고르는 중…' : '다시 추천받기'}
           </Button>
         }
       />
 
-      <section className="flex snap-x snap-mandatory gap-[15px] overflow-auto lg:grid lg:grid-cols-3 lg:overflow-visible">
-        {items.map(({ group, gift }, index) => (
-          <article
-            key={`${group.personId}-${gift.id}`}
-            className="min-w-[78%] snap-start overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_14px_30px_#503e3514] lg:min-w-0"
-          >
-            <div className="relative h-[125px]">
-              <GiftThumbnail
-                imageUrl={gift.imageUrl}
-                emoji={gift.emoji}
-                name={gift.name}
-                toneClass={TONES[index % TONES.length]}
-              />
-              <span className="absolute top-2.5 left-[11px] rounded-[10px] bg-white px-2 py-[5px] text-[8px] font-bold text-[#7a746c]">
-                {gift.tag}
-              </span>
-            </div>
-            <div className="p-[15px]">
-              <h3 className="mb-[3px] text-[13px]">{gift.name}</h3>
-              <strong className="text-xs text-[#dc725f]">{gift.price}</strong>
-              <p className="h-[29px] text-[9px] leading-[1.55] text-[#8e8981]">{gift.reason}</p>
-              {/* 구매 링크는 AI가 상품을 찾았을 때만 내려온다 */}
-              {gift.productUrl ? (
-                <a
-                  href={gift.productUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${cardFooterClass} cursor-pointer text-[#5c7769]`}
-                >
-                  이 선물로 마음 전하기 <ArrowRight size={16} />
-                </a>
-              ) : (
-                <p className={`${cardFooterClass} text-subtle`}>구매 링크를 찾지 못했어요</p>
-              )}
-            </div>
-          </article>
-        ))}
-      </section>
+      <GiftCardList gifts={items.map(({ gift }) => gift)} />
+
+      {thankYouMessage ? <ThankYouNote message={thankYouMessage} /> : null}
     </>
   );
 }
