@@ -24,16 +24,17 @@ function StatCard({ icon: Icon, label, value, detail, tone, href }: StatCardProp
       <div className={statIconStyles({ tone })}>
         <Icon size={21} />
       </div>
-      <div className="sm:grid sm:flex-1 sm:grid-cols-[auto_auto] sm:items-end">
-        <span className="mt-2 block text-[11px] font-bold text-[#6f6a63] sm:col-span-2 sm:mt-0">
-          {label}
-        </span>
-        <strong className="mt-[3px] block font-title font-bold text-[19px] sm:text-2xl">
-          {value}
-        </strong>
+      {/* 부연은 오른쪽 아래 — 숫자의 아랫선에 맞춰 따로 떠 보이지 않게 한다 */}
+      <div className="sm:flex sm:flex-1 sm:items-end sm:justify-between sm:gap-2">
+        <div className="min-w-0">
+          <span className="mt-2 block text-[11px] font-bold text-[#6f6a63] sm:mt-0">{label}</span>
+          <strong className="mt-[3px] block font-title font-bold text-[19px] sm:text-2xl">
+            {value}
+          </strong>
+        </div>
         {/* 기록이 없으면 '이번 달 +0' 같은 문구가 오히려 허전해 보인다 */}
         {detail ? (
-          <small className="hidden self-center pb-0.5 text-right text-[9px] text-[#a49f97] sm:block">
+          <small className="hidden shrink-0 pb-1 text-[10px] text-[#a49f97] sm:block">
             {detail}
           </small>
         ) : null}
