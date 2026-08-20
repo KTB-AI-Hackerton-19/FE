@@ -31,6 +31,8 @@ function GiftRecordList() {
     isGetGiftRecordsPending,
   } = useGetInfiniteGiftRecords({
     kind: 'GIFT',
+    // 저장하지 않고 닫은 AI 초안(DRAFT)이 목록에 섞이면 안 된다.
+    status: 'CONFIRMED',
     // '전체'는 카테고리 필터를 걸지 않는다는 뜻이다.
     category: category === ALL ? undefined : category,
     sort,

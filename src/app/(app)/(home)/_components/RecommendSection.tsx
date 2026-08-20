@@ -14,6 +14,9 @@ import type { RecommendationT } from '@/types/recommendation';
 
 const TONES = ['bg-[#e9f1ed]', 'bg-[#f5ede2]', 'bg-[#f7e9e7]'];
 
+const cardFooterClass =
+  'mt-2.5 flex w-full items-center justify-center gap-[5px] border-t border-line pt-[11px] text-[10px] font-bold';
+
 function RecommendSection() {
   const { dashboardData } = useGetDashboard();
   const { showToast } = useAppUi();
@@ -24,7 +27,9 @@ function RecommendSection() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const insight = dashboardData?.agentInsight;
-  const items = refreshed ?? dashboardData?.recommendations ?? [];
+  // 서버는 사람·일정 단위로 묶어 주는데, 카드는 한 줄로 늘어놓는다.
+  const groups = refreshed ?? dashboardData?.recommendations ?? [];
+  const items = groups.flatMap(group => group.gifts.map(gift => ({ group, gift })));
 
   if (items.length === 0) return null;
 
@@ -63,30 +68,36 @@ function RecommendSection() {
       />
 
       <section className="flex snap-x snap-mandatory gap-[15px] overflow-auto lg:grid lg:grid-cols-3 lg:overflow-visible">
-        {items.map((item, index) => (
+        {items.map(({ group, gift }, index) => (
           <article
-            key={item.id}
+            key={`${group.personId}-${gift.id}`}
             className="min-w-[78%] snap-start overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_14px_30px_#503e3514] lg:min-w-0"
           >
             <div
               className={`relative grid h-[125px] place-items-center text-[51px] ${TONES[index % TONES.length]}`}
             >
-              {item.emoji}
+              {gift.emoji}
               <span className="absolute top-2.5 left-[11px] rounded-[10px] bg-white px-2 py-[5px] text-[8px] font-bold text-[#7a746c]">
-                {item.tag}
+                {gift.tag}
               </span>
             </div>
             <div className="p-[15px]">
-              <h3 className="mb-[3px] text-[13px]">{item.name}</h3>
-              <strong className="text-xs text-[#dc725f]">{item.price}</strong>
-              <p className="h-[29px] text-[9px] leading-[1.55] text-[#8e8981]">{item.reason}</p>
-              <button
-                type="button"
-                onClick={() => showToast(`${item.name}을(를) 선택했어요`)}
-                className="mt-2.5 flex w-full cursor-pointer items-center justify-center gap-[5px] border-t border-line pt-[11px] text-[10px] font-bold text-[#5c7769]"
-              >
-                이 선물로 마음 전하기 <ArrowRight size={16} />
-              </button>
+              <h3 className="mb-[3px] text-[13px]">{gift.name}</h3>
+              <strong className="text-xs text-[#dc725f]">{gift.price}</strong>
+              <p className="h-[29px] text-[9px] leading-[1.55] text-[#8e8981]">{gift.reason}</p>
+              {/* 구매 링크는 AI가 상품을 찾았을 때만 내려온다 */}
+              {gift.productUrl ? (
+                <a
+                  href={gift.productUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${cardFooterClass} cursor-pointer text-[#5c7769]`}
+                >
+                  이 선물로 마음 전하기 <ArrowRight size={16} />
+                </a>
+              ) : (
+                <p className={`${cardFooterClass} text-subtle`}>구매 링크를 찾지 못했어요</p>
+              )}
             </div>
           </article>
         ))}

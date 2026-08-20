@@ -46,6 +46,8 @@ function EventRecordList() {
 
   const serverQuery = {
     kind: 'EVENT',
+    // 저장하지 않고 닫은 AI 초안(DRAFT)이 목록에 섞이면 안 된다.
+    status: 'CONFIRMED',
     categoryId: activeId ?? undefined,
     personName: debouncedKeyword.trim() || undefined,
   } as const;

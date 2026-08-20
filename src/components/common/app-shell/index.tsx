@@ -1,4 +1,7 @@
+import { Suspense } from 'react';
+
 import BottomNav from '@/components/common/bottom-nav';
+import GoogleConnectResult from '@/components/common/google-connect-result';
 import RecordModal from '@/components/common/record-modal';
 import Sidebar from '@/components/common/sidebar';
 import Toast from '@/components/common/toast';
@@ -19,6 +22,10 @@ function AppShell({ children }: AppShellProps) {
       <BottomNav />
       <RecordModal />
       <Toast />
+      {/* 구글 동의 화면에서 돌아왔을 때의 결과를 알린다 (어느 화면으로 돌아오든) */}
+      <Suspense fallback={null}>
+        <GoogleConnectResult />
+      </Suspense>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { ApiError } from '@/apis/apiClient';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import {
+  useDeleteGiftRecord,
   usePatchGiftRecord,
   usePostGiftRecord,
   usePostGiftRecordExtract,
@@ -28,6 +29,7 @@ function RecordModalContent() {
   const { postGiftRecordExtractMutation } = usePostGiftRecordExtract();
   const { postGiftRecordMutation, isPostGiftRecordPending } = usePostGiftRecord();
   const { patchGiftRecordMutation, isPatchGiftRecordPending } = usePatchGiftRecord();
+  const { deleteGiftRecordMutation } = useDeleteGiftRecord();
 
   const [step, setStep] = useState<ModalStepT>('upload');
   const [form, setForm] = useState<RecordFormT>(() => emptyRecordForm(today));
@@ -40,6 +42,15 @@ function RecordModalContent() {
 
   const handleError = (error: unknown) =>
     showToast(error instanceof ApiError ? error.message : '잠시 후 다시 시도해주세요.');
+
+  /**
+   * AI 분석은 성공하는 순간 서버에 DRAFT 기록을 만든다.
+   * 확정하지 않고 닫으면 반쪽 기록이 남으므로 여기서 지운다.
+   */
+  const handleClose = () => {
+    if (draftId !== null) deleteGiftRecordMutation(draftId);
+    closeRecordModal();
+  };
 
   const handleAnalyze = (file: File) => {
     setStep('loading');
@@ -98,12 +109,12 @@ function RecordModalContent() {
       className={`fixed inset-0 z-30 grid place-items-end bg-[#211c19]/50 backdrop-blur-[5px] sm:place-items-center sm:p-5 ${
         isSubModalOpen ? 'invisible' : ''
       }`}
-      onMouseDown={event => event.target === event.currentTarget && closeRecordModal()}
+      onMouseDown={event => event.target === event.currentTarget && handleClose()}
     >
       <div className="relative max-h-[92vh] w-full overflow-auto rounded-t-[23px] bg-[#fffdfa] px-[19px] pt-[27px] pb-[30px] shadow-[0_25px_70px_#1b171345] sm:max-w-[480px] sm:rounded-[22px] sm:p-[34px]">
         <button
           type="button"
-          onClick={closeRecordModal}
+          onClick={handleClose}
           aria-label="닫기"
           className="absolute top-[18px] right-[18px] grid size-8 cursor-pointer place-items-center rounded-full bg-[#f2efeb] text-[#77716a]"
         >

@@ -27,6 +27,9 @@ export const API = {
 
   CALENDAR: '/api/calendar',
 
+  GOOGLE_INTEGRATION: '/api/integrations/google',
+  GOOGLE_AUTHORIZE_URL: '/api/integrations/google/authorize-url',
+
   RECOMMENDATIONS: '/api/recommendations',
   SEARCH: '/api/search',
 } as const;
@@ -39,6 +42,7 @@ export const QUERY_KEY = {
   PEOPLE: ['people'],
   PERSON: (id: number) => ['people', id],
   CALENDAR: (year: number, month: number) => ['calendar', year, month],
+  GOOGLE_INTEGRATION: ['google-integration'],
   RECOMMENDATIONS: ['recommendations'],
   SEARCH: (q: string) => ['search', q],
 } as const;
