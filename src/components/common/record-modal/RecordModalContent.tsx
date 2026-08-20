@@ -11,6 +11,7 @@ import {
   usePostGiftRecord,
   usePostGiftRecordExtract,
 } from '@/hooks/useGiftRecordMutations';
+import { getTodayDateKey } from '@/utils/formatDate';
 
 import ConfirmStep from './ConfirmStep';
 import LoadingStep from './LoadingStep';
@@ -21,7 +22,8 @@ import type { ModalStepT, RecordFormT } from './recordModal.const';
 function RecordModalContent() {
   const { closeRecordModal, showToast } = useAppUi();
   const { dashboardData } = useGetDashboard();
-  const today = dashboardData?.today ?? new Date().toISOString().slice(0, 10);
+  // toISOString 은 UTC 라 한국 새벽에는 어제가 나온다 — 로컬 기준으로 계산한다.
+  const today = dashboardData?.today ?? getTodayDateKey();
 
   const { postGiftRecordExtractMutation } = usePostGiftRecordExtract();
   const { postGiftRecordMutation, isPostGiftRecordPending } = usePostGiftRecord();
@@ -29,6 +31,8 @@ function RecordModalContent() {
 
   const [step, setStep] = useState<ModalStepT>('upload');
   const [form, setForm] = useState<RecordFormT>(() => emptyRecordForm(today));
+  /** 사람 등록·카테고리 추가 모달이 떠 있는 동안은 이 모달을 감춘다 (값은 유지) */
+  const [isSubModalOpen, setIsSubModalOpen] = useState(false);
   /** AI 분석으로 만들어진 DRAFT 기록 ID. 직접 입력이면 null */
   const [draftId, setDraftId] = useState<number | null>(null);
 
@@ -60,6 +64,8 @@ function RecordModalContent() {
 
   const handleSave = (values: RecordFormT) => {
     const body = {
+      // 목록에서 고른 사람이면 id 로 확실히 연결하고, 아니면 이름으로 찾거나 새로 만들게 둔다.
+      personId: values.personId,
       personName: values.personName,
       relation: values.relation || undefined,
       date: values.date,
@@ -89,7 +95,9 @@ function RecordModalContent() {
 
   return (
     <div
-      className="fixed inset-0 z-30 grid place-items-end bg-[#211c19]/50 backdrop-blur-[5px] sm:place-items-center sm:p-5"
+      className={`fixed inset-0 z-30 grid place-items-end bg-[#211c19]/50 backdrop-blur-[5px] sm:place-items-center sm:p-5 ${
+        isSubModalOpen ? 'invisible' : ''
+      }`}
       onMouseDown={event => event.target === event.currentTarget && closeRecordModal()}
     >
       <div className="relative max-h-[92vh] w-full overflow-auto rounded-t-[23px] bg-[#fffdfa] px-[19px] pt-[27px] pb-[30px] shadow-[0_25px_70px_#1b171345] sm:max-w-[480px] sm:rounded-[22px] sm:p-[34px]">
@@ -109,6 +117,7 @@ function RecordModalContent() {
             defaultValues={form}
             isPending={isSaving}
             isDraft={draftId !== null}
+            onSubModalToggle={setIsSubModalOpen}
             onSubmit={handleSave}
           />
         )}
