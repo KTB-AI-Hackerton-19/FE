@@ -137,13 +137,10 @@ function RecordRows({
                     </span>
                   ) : null}
                 </div>
+                <p className="truncate text-[11px] text-[#716b64]">{record.gift}</p>
               </div>
 
-              <div className={`relative flex items-center gap-2 ${contentClass}`}>
-                {/* 선물 이름은 금액에 딸린 설명이라 옆에 작게 붙인다 */}
-                <span className="hidden max-w-[110px] truncate text-[10px] text-[#a29c94] sm:block">
-                  {record.gift}
-                </span>
+              <div className={`relative flex items-center gap-1.5 ${contentClass}`}>
                 <b className="max-w-[110px] truncate text-right text-[13px]">
                   {formatAmount(record.amount)}
                 </b>
