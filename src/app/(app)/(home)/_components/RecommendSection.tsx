@@ -23,9 +23,14 @@ function RecommendSection() {
   const [refreshed, setRefreshed] = useState<RecommendationT[] | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const insight = dashboardData?.agentInsight;
   // 서버는 사람·일정 단위로 묶어 주는데, 카드는 한 줄로 늘어놓는다.
   const groups = refreshed ?? dashboardData?.recommendations ?? [];
+  /**
+   * 대상 이름은 선물 목록이 들고 있는 값을 쓴다.
+   * 배너(agentInsight)는 생일과 답례일 중 가까운 쪽을 고르고 추천은 답례일을 따라가서,
+   * 둘을 섞어 쓰면 이름과 선물이 어긋난다.
+   */
+  const target = groups.find(group => group.person);
   const items = groups.flatMap(group => group.gifts.map(gift => ({ group, gift })));
   // 한 세트에 하나뿐이라 카드마다 같은 값이 들어 있다 — 아래에 한 번만 보여준다.
   const thankYouMessage = items.find(({ gift }) => gift.thankYouMessage)?.gift.thankYouMessage;
@@ -35,7 +40,10 @@ function RecommendSection() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const next = await getRecommendations({ personId: insight?.personId, refresh: true });
+      const next = await getRecommendations({
+        personId: target?.personId ?? undefined,
+        refresh: true,
+      });
       setRefreshed(next);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY.RECOMMENDATIONS });
       showToast('새로운 추천을 준비했어요');
@@ -52,14 +60,14 @@ function RecommendSection() {
         id="recommendations"
         title="이런 선물은 어때요?"
         description={
-          insight
-            ? `${insight.person}님의 관계와 마음 기록을 살펴 골랐어요.`
+          target
+            ? `${target.person}님의 관계와 마음 기록을 살펴 골랐어요.`
             : '관계와 지난 선물을 살펴 적당한 마음을 골랐어요.'
         }
         label={
-          insight ? (
+          target ? (
             <div className="mb-1.5 flex items-center gap-1 text-[10px] font-bold text-[#c88431]">
-              <Lightbulb size={15} /> {insight.person}님을 위한 추천
+              <Lightbulb size={15} /> {target.person}님을 위한 추천
             </div>
           ) : null
         }
