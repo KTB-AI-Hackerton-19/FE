@@ -14,7 +14,6 @@ import { useDeleteGiftRecords } from '@/hooks/useGiftRecordMutations';
 import type { GiftRecordT } from '@/types/record';
 import { formatAmount } from '@/utils/formatAmount';
 import { formatDate } from '@/utils/formatDate';
-import { getRecordCategoryLabel } from '@/utils/recordLabel';
 
 import type { RecordSelectionT } from '../_hooks/useRecordSelection';
 
@@ -25,8 +24,6 @@ type RecordRowsProps = {
   emptyDescription?: string;
   /** 비었을 때 기록 모달을 여는 버튼을 띄울지 (검색 결과가 없는 경우엔 감춘다) */
   canRecord?: boolean;
-  /** 경조사 목록은 행마다 카테고리가 같아 감추는 편이 낫다 */
-  showCategory?: boolean;
   /** 삭제 줄이 건수·정렬과 같은 줄에 있어 상태는 부모가 들고 있는다 */
   selection: RecordSelectionT;
 };
@@ -38,7 +35,6 @@ function RecordRows({
   emptyTitle,
   emptyDescription,
   canRecord = false,
-  showCategory = true,
   selection,
 }: RecordRowsProps) {
   const { showToast, openRecordModal } = useAppUi();
@@ -119,32 +115,35 @@ function RecordRows({
                 {record.emoji}
               </div>
 
+              {/* 홈 카드와 같은 짜임 — 날짜는 첫 줄 오른쪽, 답례 뱃지는 마지막 줄 오른쪽 */}
               <div className={`relative min-w-0 flex-1 ${contentClass}`}>
-                <span className="text-[9px] text-subtle">{formatDate(record.date)}</span>
-                <h3 className="my-[3px] text-sm">
-                  {record.person}
-                  <small className="mt-0.5 block font-normal text-[#9a948c] sm:mt-0 sm:ml-2 sm:inline">
-                    {record.relation}
-                  </small>
-                </h3>
-                <p className="text-[11px] text-[#716b64]">{record.gift}</p>
-                {/* 고르는 중에는 뱃지가 클릭을 가로채지 않게 둔다 — 행 전체가 선택 버튼이다. */}
-                <div className={`-ml-1.5 ${isSelecting ? 'pointer-events-none' : ''}`}>
-                  <ThankedBadge id={record.id} thanked={record.thanked} stopPropagation />
+                <div className="flex items-center justify-between gap-2 text-[9px] text-subtle">
+                  <span className="truncate font-bold text-[#dc725f]">{record.occasion}</span>
+                  <time dateTime={record.date} className="shrink-0">
+                    {formatDate(record.date)}
+                  </time>
+                </div>
+                <div className="my-[3px] flex min-w-0 items-center gap-1.5">
+                  <h3 className="min-w-0 truncate text-sm">{record.person}</h3>
+                  {record.relation ? (
+                    <span className="shrink-0 rounded-md bg-[#f6f4f0] px-1.5 py-0.5 text-[9px] text-[#8f8a82]">
+                      {record.relation}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="min-w-0 truncate text-[11px] text-[#716b64]">{record.gift}</p>
+                  {/* 고르는 중에는 뱃지가 클릭을 가로채지 않게 둔다 — 행 전체가 선택 버튼이다. */}
+                  <div className={`shrink-0 ${isSelecting ? 'pointer-events-none' : ''}`}>
+                    <ThankedBadge id={record.id} thanked={record.thanked} stopPropagation />
+                  </div>
                 </div>
               </div>
 
               <div className={`relative flex items-center gap-1.5 ${contentClass}`}>
-                <div className="text-right">
-                  <b className="block max-w-[88px] truncate text-[11px]">
-                    {formatAmount(record.amount)}
-                  </b>
-                  {showCategory ? (
-                    <span className="text-[9px] text-subtle">{getRecordCategoryLabel(record)}</span>
-                  ) : (
-                    <span className="text-[9px] text-subtle">{record.recordTypeLabel}</span>
-                  )}
-                </div>
+                <b className="max-w-[110px] truncate text-right text-[13px]">
+                  {formatAmount(record.amount)}
+                </b>
                 {isSelecting ? null : <ChevronRight size={18} className="text-[#b1aba3]" />}
               </div>
             </div>
