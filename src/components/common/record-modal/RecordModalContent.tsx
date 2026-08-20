@@ -7,11 +7,12 @@ import { ApiError } from '@/apis/apiClient';
 import { useAppUi } from '@/hooks/useAppUi';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import {
-  useDeleteGiftRecord,
+  useDeleteGiftRecords,
   usePatchGiftRecord,
   usePostGiftRecord,
   usePostGiftRecordExtract,
 } from '@/hooks/useGiftRecordMutations';
+import type { GiftRecordT } from '@/types/record';
 import { getTodayDateKey } from '@/utils/formatDate';
 
 import ConfirmStep from './ConfirmStep';
@@ -29,14 +30,14 @@ function RecordModalContent() {
   const { postGiftRecordExtractMutation } = usePostGiftRecordExtract();
   const { postGiftRecordMutation, isPostGiftRecordPending } = usePostGiftRecord();
   const { patchGiftRecordMutation, isPatchGiftRecordPending } = usePatchGiftRecord();
-  const { deleteGiftRecordMutation } = useDeleteGiftRecord();
+  const { deleteGiftRecordsMutation } = useDeleteGiftRecords();
 
   const [step, setStep] = useState<ModalStepT>('upload');
   const [form, setForm] = useState<RecordFormT>(() => emptyRecordForm(today));
   /** 사람 등록·카테고리 추가 모달이 떠 있는 동안은 이 모달을 감춘다 (값은 유지) */
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
-  /** AI 분석으로 만들어진 DRAFT 기록 ID. 직접 입력이면 null */
-  const [draftId, setDraftId] = useState<number | null>(null);
+  /** AI 분석으로 만들어진 DRAFT 기록들. 직접 입력이면 빈 배열 */
+  const [drafts, setDrafts] = useState<GiftRecordT[]>([]);
 
   const isSaving = isPostGiftRecordPending || isPatchGiftRecordPending;
 
@@ -48,16 +49,17 @@ function RecordModalContent() {
    * 확정하지 않고 닫으면 반쪽 기록이 남으므로 여기서 지운다.
    */
   const handleClose = () => {
-    if (draftId !== null) deleteGiftRecordMutation(draftId);
+    if (drafts.length > 0) deleteGiftRecordsMutation(drafts.map(draft => draft.id));
     closeRecordModal();
   };
 
   const handleAnalyze = (file: File) => {
     setStep('loading');
     postGiftRecordExtractMutation(file, {
-      onSuccess: draft => {
-        setDraftId(draft.id);
-        setForm(draftToForm(draft, today));
+      onSuccess: ({ records, personCount }) => {
+        setDrafts(records);
+        // 여러 명이어도 같은 확인 폼을 쓴다 — 사람별 칸만 목록으로 바뀐다.
+        setForm(draftToForm(records[0], today, personCount));
         setStep('confirm');
       },
       onError: error => {
@@ -68,7 +70,7 @@ function RecordModalContent() {
   };
 
   const handleSkip = () => {
-    setDraftId(null);
+    setDrafts([]);
     setForm(emptyRecordForm(today));
     setStep('confirm');
   };
@@ -99,10 +101,46 @@ function RecordModalContent() {
       showToast('새로운 마음을 기록했어요');
     };
 
+    /**
+     * 여러 명은 사람마다 DRAFT 가 하나씩 있어 각각 확정한다.
+     * 이름·금액·받은 날짜는 AI 값을 그대로 두고, 폼에서 함께 고른 값만 얹는다.
+     */
+    if (drafts.length > 1) {
+      // 사람마다 다른 값(이름·금액·관계·받은 날짜)은 AI 가 넣어 둔 것을 그대로 둔다.
+      // 하나라도 실어 보내면 첫 사람의 값이 전원에게 덮어써진다.
+      const {
+        personId: _personId,
+        personName: _personName,
+        relation: _relation,
+        date: _date,
+        price: _price,
+        ...shared
+      } = body;
+
+      Promise.all(
+        drafts.map(
+          draft =>
+            new Promise<void>((resolve, reject) => {
+              patchGiftRecordMutation(
+                { id: draft.id, ...shared, confirm: true },
+                { onSuccess: () => resolve(), onError: reject }
+              );
+            })
+        )
+      )
+        .then(() => {
+          closeRecordModal();
+          showToast(`${drafts.length}명의 마음을 기록했어요`);
+        })
+        .catch(handleError);
+
+      return;
+    }
+
     // AI가 만든 DRAFT면 확정(PATCH), 직접 입력이면 새로 등록(POST).
-    if (draftId !== null) {
+    if (drafts.length > 0) {
       patchGiftRecordMutation(
-        { id: draftId, ...body, confirm: true },
+        { id: drafts[0].id, ...body, confirm: true },
         { onSuccess, onError: handleError }
       );
       return;
@@ -134,7 +172,8 @@ function RecordModalContent() {
           <ConfirmStep
             defaultValues={form}
             isPending={isSaving}
-            isDraft={draftId !== null}
+            isDraft={drafts.length > 0}
+            manyRecords={drafts}
             onSubModalToggle={setIsSubModalOpen}
             onSubmit={handleSave}
           />

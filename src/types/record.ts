@@ -29,8 +29,11 @@ export type GiftRecordT = {
   extractedRelationship: string | null;
   /** 15분 만료 presigned GET URL — 캐싱하지 않는다 */
   imageUrl: string | null;
-  recordType: RecordTypeT;
-  /** '선물' · '경조사' — 그대로 출력한다 */
+  /**
+   * 대분류. 한글 라벨('경조사')로 내려오다 영문 코드(GIFT·EVENT)로 바뀌는 중이라
+   * 값으로 분기하지 않는다 — 경조사 여부는 event 를 본다.
+   */
+  recordType: string;
   recordTypeLabel: string;
   /** 경조사 기록이면 true */
   event: boolean;

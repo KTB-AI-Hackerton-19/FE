@@ -5,7 +5,9 @@ import type { GiftRecordT, RecordTypeT } from '@/types/record';
 const baseRecordFormSchema = z.object({
   /** 대분류 탭. 그대로 요청의 recordType 이 된다 */
   recordType: z.union([z.literal('GIFT'), z.literal('EVENT')]),
-  personName: z.string().min(1, '보낸 사람을 입력해주세요'),
+  personName: z.string(),
+  /** 사진에서 나온 사람 수. 2명 이상이면 사람별 칸 대신 목록으로 보여준다 */
+  personCount: z.number(),
   /** 목록에서 고른 경우에만 채워진다. 비어 있으면 서버가 이름으로 찾거나 새로 만든다 */
   personId: z.number().optional(),
   relation: z.string(),
@@ -26,6 +28,11 @@ const baseRecordFormSchema = z.object({
 
 /** 필수 항목이 탭마다 달라 여기서 갈라 본다 — 선물은 카테고리, 경조사는 행사 유형. */
 export const recordFormSchema = baseRecordFormSchema.superRefine((values, ctx) => {
+  // 여러 명이면 이름은 AI 가 읽은 값을 그대로 두므로 폼에서 받지 않는다.
+  if (values.personCount === 1 && !values.personName.trim()) {
+    ctx.addIssue({ code: 'custom', path: ['personName'], message: '보낸 사람을 입력해주세요' });
+  }
+
   if (values.recordType === 'EVENT') {
     if (!values.eventCategory) {
       ctx.addIssue({
@@ -102,6 +109,7 @@ export type ModalStepT = 'upload' | 'loading' | 'confirm';
 export const emptyRecordForm = (today: string): RecordFormT => ({
   recordType: 'GIFT',
   personName: '',
+  personCount: 1,
   personId: undefined,
   relation: '',
   date: today,
@@ -116,9 +124,15 @@ export const emptyRecordForm = (today: string): RecordFormT => ({
 });
 
 /** AI가 만든 DRAFT 기록을 확인 폼의 초기값으로 바꾼다. */
-export const draftToForm = (draft: GiftRecordT, fallbackDate: string): RecordFormT => ({
-  recordType: draft.recordType ?? 'GIFT',
+export const draftToForm = (
+  draft: GiftRecordT,
+  fallbackDate: string,
+  personCount = 1
+): RecordFormT => ({
+  // recordType 은 한글 라벨과 영문 코드가 섞여 있어 그대로 못 쓴다 — event 로 가른다.
+  recordType: draft.event ? 'EVENT' : 'GIFT',
   personName: draft.person || draft.extractedSenderName || '',
+  personCount,
   personId: draft.personId ?? undefined,
   relation: draft.relation || draft.extractedRelationship || '',
   date: draft.date || fallbackDate,
