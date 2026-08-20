@@ -23,3 +23,9 @@ export const formatFullKoreanDate = (date: string) => {
 /** 로컬 기준 'YYYY-MM-DD' (toISOString 의 UTC 밀림 방지) */
 export const toDateKey = (year: number, month: number, day: number) =>
   `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+/** 로컬 기준 오늘. 서버가 준 today 를 못 쓸 때의 대체값이다. */
+export const getTodayDateKey = () => {
+  const now = new Date();
+  return toDateKey(now.getFullYear(), now.getMonth() + 1, now.getDate());
+};
