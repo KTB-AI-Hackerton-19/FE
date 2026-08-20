@@ -146,7 +146,38 @@ function RecordModalContent() {
       return;
     }
 
-    postGiftRecordMutation(body, { onSuccess, onError: handleError });
+    /**
+     * 경조사는 한 행사에 여러 명이 오므로 고른 사람 수만큼 기록을 만든다.
+     * 하객은 '사람들' 목록에 올리지 않는다 — 목록에서 고른 사람만 personId 로 연결한다.
+     */
+    if (isEvent && values.guests.length > 0) {
+      // 관계는 사람마다 다르다 — 등록된 사람의 관계를 덮어쓰지 않도록 아예 보내지 않는다.
+      const { personId: _personId, personName: _personName, relation: _relation, ...shared } = body;
+
+      Promise.all(
+        values.guests.map(
+          guest =>
+            new Promise<void>((resolve, reject) => {
+              postGiftRecordMutation(
+                guest.personId
+                  ? { ...shared, personId: guest.personId }
+                  : { ...shared, guestName: guest.name },
+                { onSuccess: () => resolve(), onError: reject }
+              );
+            })
+        )
+      )
+        .then(() => {
+          closeRecordModal();
+          showToast(`${values.guests.length}명의 마음을 기록했어요`);
+        })
+        .catch(handleError);
+
+      return;
+    }
+
+    // 선물은 보낸 사람을 '사람들'에도 남긴다 — 이 플래그가 없으면 이름만 기록된다.
+    postGiftRecordMutation({ ...body, registerPerson: true }, { onSuccess, onError: handleError });
   };
 
   return (

@@ -7,6 +7,10 @@ import { apiClient } from './apiClient';
 export type PostGiftRecordRequestT = {
   personId?: number;
   personName?: string;
+  /** 사람으로 등록하지 않는 보낸 사람 이름 (경조사 하객). personName 보다 우선한다 */
+  guestName?: string;
+  /** true 면 이름으로 사람을 찾거나 만들어 연결한다. 생략하면 이름만 기록에 남는다 */
+  registerPerson?: boolean;
   /** GET /api/relationships 의 값만 받는다 */
   relation?: string;
   /** 생략하면 GIFT */

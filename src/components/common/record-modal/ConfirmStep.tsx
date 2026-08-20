@@ -15,6 +15,7 @@ import { formatAmount } from '@/utils/formatAmount';
 import AmountInput from './AmountInput';
 import CategoryPicker from './CategoryPicker';
 import EventFields from './EventFields';
+import GuestPicker from './GuestPicker';
 import PersonPicker from './PersonPicker';
 import {
   EVENT_GIFT_DEFAULTS,
@@ -70,6 +71,7 @@ function ConfirmStep({
   const relation = useWatch({ control, name: 'relation' });
   const eventCategory = useWatch({ control, name: 'eventCategory' });
   const eventDate = useWatch({ control, name: 'eventDate' });
+  const guests = useWatch({ control, name: 'guests' });
   const price = useWatch({ control, name: 'price' });
   const date = useWatch({ control, name: 'date' });
   const reminderDate = useWatch({ control, name: 'reminderDate' });
@@ -194,23 +196,35 @@ function ConfirmStep({
             </ul>
           </div>
         ) : null}
+        {/* 경조사는 한 행사에 여러 명이 오므로 보낸 사람을 여러 명 고른다. */}
         {isMany ? null : (
-          <div className={labelClass}>
+          // 경조사는 관계 칸이 빠지고 칩이 아래로 늘어나므로 한 줄을 다 쓴다.
+          <div className={tab.isEvent ? `${labelClass} col-span-2` : labelClass}>
             <span className={labelTextClass}>보낸 사람</span>
-            <PersonPicker
-              value={personName}
-              onChange={name => {
-                setValue('personName', name);
-                // 이름을 직접 고치면 골라 둔 사람과 어긋나므로 연결을 끊는다.
-                setValue('personId', undefined);
-              }}
-              onPick={handlePickPerson}
-              onSubModalToggle={onSubModalToggle}
-              className={fieldClass}
-            />
+            {tab.isEvent ? (
+              <GuestPicker
+                guests={guests}
+                onChange={next => setValue('guests', next)}
+                onSubModalToggle={onSubModalToggle}
+                className={fieldClass}
+              />
+            ) : (
+              <PersonPicker
+                value={personName}
+                onChange={name => {
+                  setValue('personName', name);
+                  // 이름을 직접 고치면 골라 둔 사람과 어긋나므로 연결을 끊는다.
+                  setValue('personId', undefined);
+                }}
+                onPick={handlePickPerson}
+                onSubModalToggle={onSubModalToggle}
+                className={fieldClass}
+              />
+            )}
           </div>
         )}
-        {isMany ? null : (
+        {/* 경조사는 사람마다 관계가 달라 공통 칸을 두지 않는다 — 칩에 각자의 관계가 붙는다. */}
+        {isMany || tab.isEvent ? null : (
           <div className={labelClass}>
             <span className={labelTextClass}>관계</span>
             <RelationPicker
@@ -280,7 +294,6 @@ function ConfirmStep({
           />
         </div>
       </div>
-
       {firstError ? <p className="mt-3 text-[10px] text-coral-dark">{firstError}</p> : null}
 
       <div className="sticky -bottom-[30px] mt-5 bg-[#fffdfa] pt-3">

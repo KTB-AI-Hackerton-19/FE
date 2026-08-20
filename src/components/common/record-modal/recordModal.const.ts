@@ -8,6 +8,10 @@ const baseRecordFormSchema = z.object({
   personName: z.string(),
   /** 사진에서 나온 사람 수. 2명 이상이면 사람별 칸 대신 목록으로 보여준다 */
   personCount: z.number(),
+  /** 경조사에서 고른 보낸 사람들 — 고른 수만큼 기록이 만들어진다 */
+  guests: z.array(
+    z.object({ personId: z.number().optional(), name: z.string(), relation: z.string().optional() })
+  ),
   /** 목록에서 고른 경우에만 채워진다. 비어 있으면 서버가 이름으로 찾거나 새로 만든다 */
   personId: z.number().optional(),
   relation: z.string(),
@@ -28,8 +32,15 @@ const baseRecordFormSchema = z.object({
 
 /** 필수 항목이 탭마다 달라 여기서 갈라 본다 — 선물은 카테고리, 경조사는 행사 유형. */
 export const recordFormSchema = baseRecordFormSchema.superRefine((values, ctx) => {
-  // 여러 명이면 이름은 AI 가 읽은 값을 그대로 두므로 폼에서 받지 않는다.
-  if (values.personCount === 1 && !values.personName.trim()) {
+  const isEvent = values.recordType === 'EVENT';
+  // AI 초안은 이름·금액을 그대로 두므로 폼에서 받지 않는다.
+  const isAiDraft = values.personCount > 1;
+
+  if (isEvent && !isAiDraft && values.guests.length === 0) {
+    ctx.addIssue({ code: 'custom', path: ['guests'], message: '보낸 사람을 골라주세요' });
+  }
+
+  if (!isEvent && !isAiDraft && !values.personName.trim()) {
     ctx.addIssue({ code: 'custom', path: ['personName'], message: '보낸 사람을 입력해주세요' });
   }
 
@@ -110,6 +121,7 @@ export const emptyRecordForm = (today: string): RecordFormT => ({
   recordType: 'GIFT',
   personName: '',
   personCount: 1,
+  guests: [],
   personId: undefined,
   relation: '',
   date: today,
@@ -133,6 +145,7 @@ export const draftToForm = (
   recordType: draft.event ? 'EVENT' : 'GIFT',
   personName: draft.person || draft.extractedSenderName || '',
   personCount,
+  guests: [],
   personId: draft.personId ?? undefined,
   relation: draft.relation || draft.extractedRelationship || '',
   date: draft.date || fallbackDate,
