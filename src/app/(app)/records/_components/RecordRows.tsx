@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { ApiError } from '@/apis/apiClient';
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import EmptyState from '@/components/common/empty-state';
 import { recordEmojiStyles } from '@/components/common/record-card/recordCard.style';
 import ThankedBadge from '@/components/common/thanked-badge';
 import { useAppUi } from '@/hooks/useAppUi';
@@ -17,14 +18,24 @@ import { formatDate } from '@/utils/formatDate';
 type RecordRowsProps = {
   records: GiftRecordT[];
   isPending: boolean;
-  emptyText: string;
+  emptyTitle: string;
+  emptyDescription?: string;
+  /** 비었을 때 기록 모달을 여는 버튼을 띄울지 (검색 결과가 없는 경우엔 감춘다) */
+  canRecord?: boolean;
   /** 경조사 목록은 행마다 카테고리가 같아 감추는 편이 낫다 */
   showCategory?: boolean;
 };
 
 /** 선물·경조사 탭이 함께 쓰는 기록 목록. 삭제 확인까지 여기서 처리한다. */
-function RecordRows({ records, isPending, emptyText, showCategory = true }: RecordRowsProps) {
-  const { showToast } = useAppUi();
+function RecordRows({
+  records,
+  isPending,
+  emptyTitle,
+  emptyDescription,
+  canRecord = false,
+  showCategory = true,
+}: RecordRowsProps) {
+  const { showToast, openRecordModal } = useAppUi();
   const { deleteGiftRecordMutation, isDeleteGiftRecordPending } = useDeleteGiftRecord();
   const [pendingDelete, setPendingDelete] = useState<GiftRecordT | null>(null);
 
@@ -45,9 +56,12 @@ function RecordRows({ records, isPending, emptyText, showCategory = true }: Reco
 
   if (records.length === 0 && !isPending) {
     return (
-      <div className="rounded-[17px] border border-dashed border-[#d8d2ca] bg-white p-8 text-center text-[11px] text-muted">
-        {emptyText}
-      </div>
+      <EmptyState
+        title={emptyTitle}
+        description={emptyDescription}
+        actionLabel={canRecord ? '마음 기록하기' : undefined}
+        onAction={canRecord ? openRecordModal : undefined}
+      />
     );
   }
 

@@ -75,7 +75,9 @@ function GiftRecordList() {
       <RecordRows
         records={giftRecords}
         isPending={isGetGiftRecordsPending}
-        emptyText="아직 기록한 마음이 없어요."
+        emptyTitle="아직 기록된 마음이 없어요"
+        emptyDescription="받은 선물을 기록하러 가볼까요?"
+        canRecord
       />
 
       <InfiniteScrollSentinel
