@@ -1,11 +1,5 @@
-import type { Metadata } from 'next';
-
 import BrandPanel from './_components/BrandPanel';
 import LoginForm from './_components/LoginForm';
-
-export const metadata: Metadata = {
-  title: '로그인 — Giftie',
-};
 
 export default function LoginPage() {
   return (

@@ -1,13 +1,7 @@
-import type { Metadata } from 'next';
-
 import PageContainer from '@/components/common/page-container';
 import PageHeader from '@/components/common/page-header';
 
 import RecordsTabs from './_components/RecordsTabs';
-
-export const metadata: Metadata = {
-  title: '마음 기록 — Giftie',
-};
 
 export default function RecordsPage() {
   return (

@@ -6,7 +6,7 @@ import { PRETENDARD_CSS_HREF, baloo2 } from './fonts';
 import Providers from './providers';
 
 export const metadata: Metadata = {
-  title: 'Giftie - 마음을 기억하는 가장 쉬운 방법',
+  title: 'Giftie | 마음을 기억하는 가장 쉬운 방법',
   description:
     '선물과 부조금 기록을 AI가 대신 정리하고, 답례 시점과 선물까지 찾아주는 인간관계 관리 서비스',
   icons: {

@@ -1,13 +1,7 @@
-import type { Metadata } from 'next';
-
 import PageContainer from '@/components/common/page-container';
 import PageHeader from '@/components/common/page-header';
 
 import CalendarView from './_components/CalendarView';
-
-export const metadata: Metadata = {
-  title: '마음 캘린더 — Giftie',
-};
 
 export default function CalendarPage() {
   return (
