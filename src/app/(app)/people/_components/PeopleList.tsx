@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Heart, Plus, User } from 'lucide-react';
+import { ChevronRight, Gift, Plus, User } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -136,9 +136,9 @@ function PeopleList() {
                       {person.relation}
                     </span>
                   ) : null}
-                  {/* '마음 4개'보다 하트에 숫자만 붙이는 편이 한눈에 읽힌다 */}
+                  {/* '마음 4개'보다 아이콘에 숫자만 붙이는 편이 한눈에 읽힌다 */}
                   <span className="flex shrink-0 items-center gap-0.5 text-[10px] text-[#c98878]">
-                    <Heart size={11} fill="currentColor" />
+                    <Gift size={11} />
                     {person.giftCount}
                   </span>
                 </div>
