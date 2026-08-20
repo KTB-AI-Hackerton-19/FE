@@ -6,7 +6,11 @@ import { useState } from 'react';
 
 import EmptyState from '@/components/common/empty-state';
 import { useGetCalendar } from '@/hooks/useGetCalendar';
+import { useGetEventCategories } from '@/hooks/useGetEventCategories';
+import { formatAmount } from '@/utils/formatAmount';
 import { formatKoreanDate, toDateKey } from '@/utils/formatDate';
+
+import { splitDayEvents } from './dayEvents.const';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -21,6 +25,7 @@ function MonthCalendar({ today }: MonthCalendarProps) {
   const [selectedDate, setSelectedDate] = useState(today);
 
   const { calendarData } = useGetCalendar(cursor);
+  const { eventCategories } = useGetEventCategories();
 
   const { year, month } = cursor;
   const firstWeekday = new Date(year, month - 1, 1).getDay();
@@ -29,6 +34,9 @@ function MonthCalendar({ today }: MonthCalendarProps) {
   // 이벤트가 있는 날짜만 응답에 담기므로 날짜 → 일자 정보로 인덱싱해 둔다.
   const dayMap = new Map((calendarData?.days ?? []).map(day => [day.date, day]));
   const selectedDay = dayMap.get(selectedDate);
+
+  // 경조사는 유형으로 접고 나머지는 한 건씩 보여준다.
+  const { eventGroups, singles } = splitDayEvents(selectedDay?.events ?? [], eventCategories);
 
   const moveMonth = (amount: number) => {
     const next = new Date(year, month - 1 + amount, 1);
@@ -91,6 +99,8 @@ function MonthCalendar({ today }: MonthCalendarProps) {
             const dateKey = toDateKey(year, month, day);
             const dayData = dayMap.get(dateKey);
             const received = dayData?.events.filter(event => event.type === 'RECEIVED') ?? [];
+            // 경조사는 한 날에 수십 명이라 같은 이모지가 반복된다 — 종류만 남긴다.
+            const emojis = [...new Set(received.map(event => event.emoji))];
             const hasEvent = Boolean(dayData);
 
             return (
@@ -106,9 +116,9 @@ function MonthCalendar({ today }: MonthCalendarProps) {
                   {day}
                 </span>
                 <div className="flex h-[22px] items-center gap-0.5">
-                  {received.slice(0, 2).map(event => (
-                    <i key={event.id} className="text-[11px] not-italic lg:text-sm">
-                      {event.emoji}
+                  {emojis.slice(0, 2).map(emoji => (
+                    <i key={emoji} className="text-[11px] not-italic lg:text-sm">
+                      {emoji}
                     </i>
                   ))}
                   {(dayData?.toGiveCount ?? 0) > 0 && (
@@ -138,7 +148,28 @@ function MonthCalendar({ today }: MonthCalendarProps) {
 
         {selectedDay && selectedDay.events.length > 0 ? (
           <div className="grid gap-[9px]">
-            {selectedDay.events.map(event => (
+            {eventGroups.map(group => (
+              <Link
+                key={group.label}
+                href={{ pathname: '/records', query: { event: group.label } }}
+                aria-label={`${group.label} 기록 보기`}
+                className="flex items-center gap-3 rounded-[14px] border border-line bg-white p-3.5 transition hover:bg-[#fdfaf7]"
+              >
+                <div className="grid size-10 place-items-center rounded-xl bg-[#f6eee9] text-xl">
+                  {group.emoji}
+                </div>
+                <div className="flex-1">
+                  <span className="text-[8px] text-[#dc725f]">경조사</span>
+                  <h3 className="my-0.5 text-xs">{group.label}</h3>
+                  <p className="text-[9px] text-[#908a82]">
+                    {group.peopleCount}명 · {formatAmount(group.totalAmount)}
+                  </p>
+                </div>
+                <ChevronRight size={17} className="text-[#b1aba3]" />
+              </Link>
+            ))}
+
+            {singles.map(event => (
               <Link
                 key={`${event.type}-${event.id}`}
                 href={`/people/${event.personId}`}

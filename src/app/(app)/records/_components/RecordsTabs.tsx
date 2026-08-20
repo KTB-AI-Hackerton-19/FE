@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import EventRecordList from './EventRecordList';
@@ -13,7 +14,9 @@ const TABS = [
 type TabKeyT = (typeof TABS)[number]['key'];
 
 function RecordsTabs() {
-  const [tab, setTab] = useState<TabKeyT>('GIFT');
+  // 달력에서 '결혼' 같은 행사 유형을 눌러 오면 그 탭·유형으로 열어 준다.
+  const eventCategory = useSearchParams().get('event');
+  const [tab, setTab] = useState<TabKeyT>(eventCategory ? 'EVENT' : 'GIFT');
 
   return (
     <>
@@ -34,7 +37,7 @@ function RecordsTabs() {
       </div>
 
       {/* 탭을 바꾸면 필터·검색어를 새로 시작하도록 조건부 마운트한다. */}
-      {tab === 'GIFT' ? <GiftRecordList /> : <EventRecordList />}
+      {tab === 'GIFT' ? <GiftRecordList /> : <EventRecordList initialCategory={eventCategory} />}
     </>
   );
 }
