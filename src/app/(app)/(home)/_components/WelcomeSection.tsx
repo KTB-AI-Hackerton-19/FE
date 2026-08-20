@@ -1,5 +1,6 @@
 'use client';
 
+import LetterIcon from '@/assets/icons/letter.svg';
 import { useGetDashboard } from '@/hooks/useGetDashboard';
 import { formatFullKoreanDate } from '@/utils/formatDate';
 
@@ -20,7 +21,11 @@ function WelcomeSection() {
       </div>
 
       <div className="relative mr-[30px] hidden size-[170px] h-[140px] place-items-center rounded-[48%_52%_55%_45%] bg-[#f5e5df] lg:grid">
-        <span className="rotate-[-7deg] text-[63px] drop-shadow-[0_10px_10px_#c4776630]">💌</span>
+        <LetterIcon
+          width={74}
+          height={74}
+          className="rotate-[-7deg] text-coral drop-shadow-[0_10px_10px_#c4776630]"
+        />
         <div className="absolute top-[18px] -right-1.5 grid size-8 place-items-center rounded-full bg-white text-coral shadow-[0_8px_20px_#6d4e4518]">
           ♥
         </div>
