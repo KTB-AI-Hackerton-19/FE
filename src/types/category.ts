@@ -24,4 +24,8 @@ export type CategoryT = {
   /** 화면 표시용 포맷 문자열 (직접 파싱 금지) */
   totalAmountText: string;
   latestDate: string | null;
+  /** 사용자가 입력한 실제 행사 날짜 (선물 카테고리는 항상 null) */
+  eventDate: string | null;
+  /** 카드에 그릴 날짜 — 행사일이 있으면 행사일, 없으면 최근 기록일. 정렬도 이 기준이다 */
+  displayDate: string | null;
 };
