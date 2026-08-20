@@ -32,6 +32,24 @@ export const useGetPeople = () => {
   };
 };
 
+/**
+ * 기록 모달의 사람 선택용.
+ * 검색어가 없으면 전체 목록을 보여 주고, 치기 시작하면 좁힌다.
+ */
+export const useSearchPeople = (keyword: string) => {
+  const trimmed = keyword.trim();
+
+  const { data, isFetching: isSearchPeopleFetching } = useQuery({
+    queryKey: [...QUERY_KEY.PEOPLE, 'search', trimmed],
+    queryFn: () => getPeople({ q: trimmed || undefined, size: 20 }),
+    // 글자를 칠 때마다 키가 바뀌는데, 이전 결과를 붙잡아 두지 않으면
+    // 매번 빈 목록을 거쳐 가서 선택창이 깜빡인다.
+    placeholderData: previous => previous,
+  });
+
+  return { searchedPeople: data?.content ?? [], isSearchPeopleFetching };
+};
+
 export const useGetPerson = (id: number) => {
   const {
     data: personData,
