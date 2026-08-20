@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Plus, User } from 'lucide-react';
+import { ChevronRight, Heart, Plus, User } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -129,14 +129,23 @@ function PeopleList() {
             );
             const body = (
               <div className="min-w-0 flex-1">
-                <h3 className="mb-[3px] text-sm">{person.name}</h3>
-                <p className="text-[10px] text-[#908a82]">
-                  {person.relation} · 마음 {person.giftCount}개
-                </p>
-                {person.latestGift ? (
-                  <span className="mt-1.5 block truncate text-[10px] text-[#6f7e76]">
-                    최근 {person.latestGift}
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <h3 className="min-w-0 truncate text-sm font-bold">{person.name}</h3>
+                  {person.relation ? (
+                    <span className="shrink-0 rounded-md bg-[#f6f4f0] px-1.5 py-0.5 text-[9px] text-[#8f8a82]">
+                      {person.relation}
+                    </span>
+                  ) : null}
+                  {/* '마음 4개'보다 하트에 숫자만 붙이는 편이 한눈에 읽힌다 */}
+                  <span className="flex shrink-0 items-center gap-0.5 text-[10px] text-[#c98878]">
+                    <Heart size={11} fill="currentColor" />
+                    {person.giftCount}
                   </span>
+                </div>
+                {person.latestGift ? (
+                  <p className="mt-[5px] truncate text-[10px] text-[#908a82]">
+                    최근 받은 마음 <span className="text-[#d9d3cb]">|</span> {person.latestGift}
+                  </p>
                 ) : null}
               </div>
             );
