@@ -97,6 +97,7 @@ function PersonFormModal({ person, onCreated, onClose }: PersonFormModalProps) {
             value={relation}
             onChange={setRelation}
             onSubModalToggle={setIsSubModalOpen}
+            addButtonSize="lg"
             className={fieldClass}
           />
         </div>

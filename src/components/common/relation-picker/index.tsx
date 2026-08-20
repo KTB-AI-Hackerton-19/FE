@@ -13,11 +13,19 @@ type RelationPickerProps = {
   onChange: (value: string) => void;
   /** 관계 추가 모달이 열리고 닫힌 것을 알린다 — 아래 모달을 감추는 데 쓴다 */
   onSubModalToggle?: (isOpen: boolean) => void;
+  /** + 버튼 크기 — 화면마다 칸 높이가 달라 옆 칸에 맞춘다 (기본 36px) */
+  addButtonSize?: 'md' | 'lg';
   className: string;
 };
 
 /** 관계 선택. 목록에서 고르거나, 없으면 + 로 새로 만든다. */
-function RelationPicker({ value, onChange, onSubModalToggle, className }: RelationPickerProps) {
+function RelationPicker({
+  value,
+  onChange,
+  onSubModalToggle,
+  addButtonSize,
+  className,
+}: RelationPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -62,7 +70,7 @@ function RelationPicker({ value, onChange, onSubModalToggle, className }: Relati
           <span className={value ? 'truncate' : 'truncate text-subtle'}>{value || '선택'}</span>
           <ChevronDown size={13} className="shrink-0 text-subtle" />
         </button>
-        <AddButton label="관계 추가" onClick={openAdd} />
+        <AddButton label="관계 추가" onClick={openAdd} size={addButtonSize} />
       </div>
 
       {isOpen ? (
