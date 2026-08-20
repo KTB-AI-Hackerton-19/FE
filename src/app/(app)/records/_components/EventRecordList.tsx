@@ -23,11 +23,16 @@ import { isInAmountBucket } from './eventAmountChart.const';
 /** 칩 하나가 곧 필터 하나. null 은 '전체' */
 const ALL = null;
 
-function EventRecordList() {
+type EventRecordListProps = {
+  /** 달력에서 눌러 온 행사 유형 라벨. 없으면 전체로 시작한다 */
+  initialCategory?: string | null;
+};
+
+function EventRecordList({ initialCategory }: EventRecordListProps) {
   const { eventCategories } = useGetEventCategories();
 
   /** null 이면 모든 경조사를 함께 본다. 값이 있으면 유형 라벨('결혼' 등) */
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(initialCategory ?? ALL);
   const [keyword, setKeyword] = useState('');
   const { openRecordModal } = useAppUi();
 

@@ -1,4 +1,5 @@
 import { API } from '@/consts/api';
+import type { EventCategoryT } from '@/types/eventCategory';
 import type { GiftRecordT, RecordTypeT } from '@/types/record';
 
 import { apiClient } from './apiClient';
@@ -6,6 +7,10 @@ import { apiClient } from './apiClient';
 export type PostGiftRecordRequestT = {
   personId?: number;
   personName?: string;
+  /** 사람으로 등록하지 않는 보낸 사람 이름 (경조사 하객). personName 보다 우선한다 */
+  guestName?: string;
+  /** true 면 이름으로 사람을 찾거나 만들어 연결한다. 생략하면 이름만 기록에 남는다 */
+  registerPerson?: boolean;
   /** GET /api/relationships 의 값만 받는다 */
   relation?: string;
   /** 생략하면 GIFT */
@@ -48,7 +53,17 @@ export const patchGiftRecordThanked = ({ id, thanked }: PatchGiftRecordThankedRe
   apiClient.patch<GiftRecordT>(API.GIFT_RECORD_THANKED(id), { thanked });
 
 export type PostGiftRecordExtractRequestT = { imageKey: string };
-export type PostGiftRecordExtractResponseT = GiftRecordT;
+
+export type PostGiftRecordExtractResponseT = {
+  /** 사진에서 찾은 사람 수 */
+  personCount: number;
+  /** 2명 이상인지 — 단건 확인 폼과 여러 명 확인 목록을 가르는 값 */
+  multiple: boolean;
+  /** 사람별 DRAFT 기록. 하나씩 PATCH 로 확정한다 */
+  records: GiftRecordT[];
+  /** 경조사로 판정됐을 때의 유형. 선물이면 null */
+  eventCategory: EventCategoryT | null;
+};
 
 /** 업로드된 이미지를 AI가 분석해 DRAFT 기록을 만든다. */
 export const postGiftRecordExtract = (body: PostGiftRecordExtractRequestT) =>

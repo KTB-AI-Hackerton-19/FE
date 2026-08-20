@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import PageContainer from '@/components/common/page-container';
 import PageHeader from '@/components/common/page-header';
 
@@ -11,7 +13,10 @@ export default function RecordsPage() {
         title="받은 마음을 모아봤어요"
         description="선물과 부조금을 잊지 않도록 차곡차곡 기록해요."
       />
-      <RecordsTabs />
+      {/* 달력에서 넘어온 ?event= 를 읽으므로 Suspense 로 감싼다. */}
+      <Suspense>
+        <RecordsTabs />
+      </Suspense>
     </PageContainer>
   );
 }

@@ -69,7 +69,7 @@ function EventFields({
   return (
     <>
       <div className={labelClass}>
-        <span className={labelTextClass}>행사 유형</span>
+        <span className={labelTextClass}>경조사 유형</span>
         <div ref={containerRef} className="relative">
           <button
             type="button"
@@ -122,7 +122,7 @@ function EventFields({
       </div>
 
       <div className={labelClass}>
-        <span className={labelTextClass}>행사 날짜</span>
+        <span className={labelTextClass}>경조사 날짜</span>
         <DatePicker
           value={dateValue}
           onChange={onDateChange}

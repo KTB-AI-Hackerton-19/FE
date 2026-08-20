@@ -67,46 +67,58 @@ function CategoryPicker({
   };
 
   const keyword = value.trim();
-  const suggestions = categories.filter(
-    category => category.name !== value && (!keyword || category.name.includes(keyword))
-  );
+  /**
+   * 이미 고른 값이면 그 이름이 검색어로 쓰여 목록이 비어 버린다 (AI 가 채워 온 '기타' 등).
+   * 고른 상태에서는 거르지 말고 전체를 보여주고 고른 것만 표시해 준다.
+   */
+  const isPicked = categories.some(category => category.name === keyword);
+  const suggestions = isPicked
+    ? categories
+    : categories.filter(category => !keyword || category.name.includes(keyword));
 
   return (
     <div ref={containerRef} className="relative">
       <div className="flex gap-1.5">
-        <input
-          value={value}
-          onChange={event => {
-            onChange(event.target.value);
-            setIsOpen(true);
-          }}
-          onFocus={() => setIsOpen(true)}
-          onKeyDown={event => event.key === 'Escape' && close()}
-          placeholder="선택 또는 검색"
-          className={`${className} min-w-0 flex-1`}
-        />
+        {/* 목록은 + 버튼을 뺀 입력칸 너비에 맞춘다 — 이 span 이 기준이 된다. */}
+        <span className="relative min-w-0 flex-1">
+          <input
+            value={value}
+            onChange={event => {
+              onChange(event.target.value);
+              setIsOpen(true);
+            }}
+            onFocus={() => setIsOpen(true)}
+            onKeyDown={event => event.key === 'Escape' && close()}
+            placeholder="선택 또는 검색"
+            className={`${className} w-full`}
+          />
+
+          {isOpen && suggestions.length > 0 ? (
+            <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
+              {suggestions.map(category => (
+                <li key={category.id}>
+                  <button
+                    type="button"
+                    onClick={() => handlePick(category.name)}
+                    className={`flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream ${
+                      category.name === value ? 'bg-cream font-bold text-coral-deep' : ''
+                    }`}
+                  >
+                    <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f4efe9] text-[11px]">
+                      {category.emoji}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">{category.name}</span>
+                    <span className="shrink-0 text-[10px] text-subtle">
+                      {category.recordCount}건
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </span>
         <AddButton label={addTitle} onClick={openAdd} />
       </div>
-
-      {isOpen && suggestions.length > 0 ? (
-        <ul className="absolute top-[calc(100%+4px)] left-0 z-10 max-h-[196px] w-full overflow-auto rounded-[12px] border border-line bg-white p-1 shadow-[0_12px_30px_#4b3a3218]">
-          {suggestions.map(category => (
-            <li key={category.id}>
-              <button
-                type="button"
-                onClick={() => handlePick(category.name)}
-                className="flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] hover:bg-cream"
-              >
-                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#f4efe9] text-[11px]">
-                  {category.emoji}
-                </span>
-                <span className="min-w-0 flex-1 truncate">{category.name}</span>
-                <span className="shrink-0 text-[10px] text-subtle">{category.recordCount}건</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
 
       {isAddOpen ? (
         <CategoryAddModal

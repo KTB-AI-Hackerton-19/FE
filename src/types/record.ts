@@ -29,8 +29,8 @@ export type GiftRecordT = {
   extractedRelationship: string | null;
   /** 15분 만료 presigned GET URL — 캐싱하지 않는다 */
   imageUrl: string | null;
+  /** 대분류 코드. 경조사 여부는 이 값 대신 event 를 본다 */
   recordType: RecordTypeT;
-  /** '선물' · '경조사' — 그대로 출력한다 */
   recordTypeLabel: string;
   /** 경조사 기록이면 true */
   event: boolean;
