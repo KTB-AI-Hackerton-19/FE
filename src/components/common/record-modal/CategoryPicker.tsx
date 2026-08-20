@@ -4,14 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 
 import AddButton from '@/components/common/add-button';
 import CategoryAddModal from '@/components/common/category-add-modal';
-import type { CategoryT, KindT } from '@/types/category';
+import type { CategoryT } from '@/types/category';
 
 type CategoryPickerProps = {
   value: string;
   categories: CategoryT[];
   onChange: (name: string) => void;
-  /** 새로 만들 카테고리가 속할 분류 */
-  addKind: KindT;
   addTitle: string;
   addNameLabel: string;
   addPlaceholder: string;
@@ -25,7 +23,6 @@ function CategoryPicker({
   value,
   categories,
   onChange,
-  addKind,
   addTitle,
   addNameLabel,
   addPlaceholder,
@@ -113,7 +110,6 @@ function CategoryPicker({
 
       {isAddOpen ? (
         <CategoryAddModal
-          kinds={[{ key: addKind, label: '' }]}
           title={addTitle}
           nameLabel={addNameLabel}
           namePlaceholder={addPlaceholder}

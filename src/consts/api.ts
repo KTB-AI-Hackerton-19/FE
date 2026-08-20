@@ -23,6 +23,7 @@ export const API = {
 
   PEOPLE: '/api/people',
   RELATIONSHIPS: '/api/relationships',
+  EVENT_CATEGORIES: '/api/gift-records/event-categories',
   PERSON: (id: number) => `/api/people/${id}`,
   PERSON_GIFT_RECORDS: (id: number) => `/api/people/${id}/gift-records`,
 
@@ -42,6 +43,7 @@ export const QUERY_KEY = {
   GIFT_RECORDS: ['gift-records'],
   PEOPLE: ['people'],
   RELATIONSHIPS: ['relationships'],
+  EVENT_CATEGORIES: ['event-categories'],
   PERSON: (id: number) => ['people', id],
   CALENDAR: (year: number, month: number) => ['calendar', year, month],
   GOOGLE_INTEGRATION: ['google-integration'],

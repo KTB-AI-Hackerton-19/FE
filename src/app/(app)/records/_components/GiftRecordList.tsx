@@ -19,7 +19,7 @@ function GiftRecordList() {
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
   const [sort, setSort] = useState<SortKeyT>('latest');
 
-  const { categoriesData } = useGetCategories({ kind: 'GIFT' });
+  const { categoriesData } = useGetCategories();
 
   // 필터링은 서버에서 처리한다 — 전체를 받아 클라이언트에서 거르지 않는다.
   const {

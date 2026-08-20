@@ -28,7 +28,7 @@ type CategoryManagerModalProps = {
 
 function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
   // 선물 탭에서 여는 관리 모달이라 선물 카테고리만 다룬다 — 행사는 경조사 탭에서 관리한다.
-  const { categoriesData } = useGetCategories({ kind: 'GIFT' });
+  const { categoriesData } = useGetCategories();
   const { postCategoryMutation, isPostCategoryPending } = usePostCategory();
   const { patchCategoryMutation, isPatchCategoryPending } = usePatchCategory();
   const { showToast } = useAppUi();
@@ -61,12 +61,10 @@ function CategoryManagerModal({ onClose }: CategoryManagerModalProps) {
     event.preventDefault();
     if (!name.trim()) return;
 
-    // kind 를 명시해 둔다 — 서버 기본값이 바뀌어도 여기서 행사가 만들어지면 안 된다.
     const body = {
       name: name.trim(),
       emoji: emoji.trim() || undefined,
       color,
-      kind: 'GIFT',
     } as const;
 
     if (editing) {

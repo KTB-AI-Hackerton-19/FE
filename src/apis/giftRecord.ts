@@ -1,14 +1,24 @@
 import { API } from '@/consts/api';
-import type { GiftRecordT } from '@/types/record';
+import type { GiftRecordT, RecordTypeT } from '@/types/record';
 
 import { apiClient } from './apiClient';
 
 export type PostGiftRecordRequestT = {
   personId?: number;
   personName?: string;
+  /** GET /api/relationships 의 값만 받는다 */
   relation?: string;
+  /** 생략하면 GIFT */
+  recordType?: RecordTypeT;
+  /** GIFT 에서만 쓰인다 */
   categoryId?: number;
+  /** GIFT 에서만 쓰인다. 없는 이름을 보내면 '기타'로 저장된다 */
   category?: string;
+  /** EVENT 에서는 필수 — 고정 7종의 코드(WEDDING) 또는 한글 라벨(결혼) */
+  eventCategory?: string;
+  /** EVENT 에서만 쓰인다 — 행사가 실제로 열린 날 */
+  eventDate?: string;
+  /** GIFT 에서만 쓰인다 */
   occasion?: string;
   gift?: string;
   /** 숫자와 "35,000원" 형식 문자열 모두 허용된다 */

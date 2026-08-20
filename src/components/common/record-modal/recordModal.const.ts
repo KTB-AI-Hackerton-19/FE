@@ -1,9 +1,10 @@
 import { z } from 'zod';
 
-import type { KindT } from '@/types/category';
-import type { GiftRecordT } from '@/types/record';
+import type { GiftRecordT, RecordTypeT } from '@/types/record';
 
-export const recordFormSchema = z.object({
+const baseRecordFormSchema = z.object({
+  /** 대분류 탭. 그대로 요청의 recordType 이 된다 */
+  recordType: z.union([z.literal('GIFT'), z.literal('EVENT')]),
   personName: z.string().min(1, '보낸 사람을 입력해주세요'),
   /** 목록에서 고른 경우에만 채워진다. 비어 있으면 서버가 이름으로 찾거나 새로 만든다 */
   personId: z.number().optional(),
@@ -12,15 +13,38 @@ export const recordFormSchema = z.object({
   occasion: z.string(),
   gift: z.string().min(1, '선물을 입력해주세요'),
   price: z.string(),
-  category: z.string().min(1, '카테고리를 선택해주세요'),
-  /** 경조사 탭에서만 쓴다 — 행사를 새로 만들 때의 분류 */
-  eventKind: z.union([z.literal('CELEBRATION'), z.literal('CONDOLENCE')]),
+  /** 선물 탭에서만 쓴다 */
+  category: z.string(),
+  /** 경조사 탭에서만 쓴다 — 서버가 정한 유형 코드(WEDDING 등) */
+  eventCategory: z.string(),
+  /** 경사·조사. 유형 목록을 좁히고 받은 마음 기본값을 정한다 */
+  eventGroup: z.union([z.literal('CELEBRATION'), z.literal('CONDOLENCE')]),
+  /** 행사가 실제로 열린 날 */
+  eventDate: z.string(),
   reminderDate: z.string(),
 });
 
-export type RecordFormT = z.infer<typeof recordFormSchema>;
+/** 필수 항목이 탭마다 달라 여기서 갈라 본다 — 선물은 카테고리, 경조사는 행사 유형. */
+export const recordFormSchema = baseRecordFormSchema.superRefine((values, ctx) => {
+  if (values.recordType === 'EVENT') {
+    if (!values.eventCategory) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['eventCategory'],
+        message: '행사 유형을 선택해주세요',
+      });
+    }
+    return;
+  }
 
-/** 카테고리 선택을 좁히는 탭. 카테고리 자체가 kind 를 들고 있어 폼 값으로는 보내지 않는다. */
+  if (!values.category) {
+    ctx.addIssue({ code: 'custom', path: ['category'], message: '카테고리를 선택해주세요' });
+  }
+});
+
+export type RecordFormT = z.infer<typeof baseRecordFormSchema>;
+
+/** 대분류 탭. 고른 값이 그대로 요청의 recordType 이 된다. */
 export const KIND_TABS = [
   {
     key: 'GIFT',
@@ -35,7 +59,7 @@ export const KIND_TABS = [
   {
     key: 'EVENT',
     label: '경조사',
-    categoryLabel: '행사 이름',
+    categoryLabel: '행사 유형',
     // 경조사에서 이 칸에 들어가는 값은 조의금·축의금이라 '선물'로 부르면 어색하다.
     giftLabel: '받은 마음',
     // 경사·조사를 고르면 축의금·조의금이 채워지므로 안내 문구가 필요 없다.
@@ -43,11 +67,11 @@ export const KIND_TABS = [
     pricePlaceholder: '100,000',
     // 행사 이름이 곧 사유라 '받은 이유'는 겹친다.
     showOccasion: false,
-    // 경조사는 목록에서 고르지 않고 경사·조사 + 이름을 폼에서 직접 적는다.
+    // 경조사는 선물 카테고리 대신 고정 7종 유형을 고른다.
     isEvent: true,
   },
 ] as const satisfies readonly {
-  key: string;
+  key: RecordTypeT;
   label: string;
   categoryLabel: string;
   giftLabel: string;
@@ -57,13 +81,12 @@ export const KIND_TABS = [
   isEvent: boolean;
 }[];
 
-/** 카테고리 추가 모달은 선물 탭에서만 쓴다. */
+/** 카테고리 추가 모달은 선물 탭에서만 쓴다 — 경조사 유형은 서버 고정이라 만들 수 없다. */
 export const GIFT_CATEGORY_ADD = {
-  kind: 'GIFT',
-  title: '새 선물 카테고리',
+  title: '카테고리 추가',
   nameLabel: '카테고리 이름',
   placeholder: '디저트',
-} as const satisfies { kind: KindT; title: string; nameLabel: string; placeholder: string };
+} as const;
 
 /** 경조사는 대부분 축의금·조의금이라 분류를 고르면 미리 채워 준다. */
 export const EVENT_GIFT_DEFAULTS = {
@@ -71,11 +94,10 @@ export const EVENT_GIFT_DEFAULTS = {
   CONDOLENCE: '조의금',
 } as const;
 
-export type KindTabT = (typeof KIND_TABS)[number]['key'];
-
 export type ModalStepT = 'upload' | 'loading' | 'confirm';
 
 export const emptyRecordForm = (today: string): RecordFormT => ({
+  recordType: 'GIFT',
   personName: '',
   personId: undefined,
   relation: '',
@@ -84,12 +106,15 @@ export const emptyRecordForm = (today: string): RecordFormT => ({
   gift: '',
   price: '',
   category: '',
-  eventKind: 'CELEBRATION',
+  eventCategory: '',
+  eventGroup: 'CELEBRATION',
+  eventDate: '',
   reminderDate: '',
 });
 
 /** AI가 만든 DRAFT 기록을 확인 폼의 초기값으로 바꾼다. */
 export const draftToForm = (draft: GiftRecordT, fallbackDate: string): RecordFormT => ({
+  recordType: draft.recordType ?? 'GIFT',
   personName: draft.person || draft.extractedSenderName || '',
   personId: draft.personId ?? undefined,
   relation: draft.relation || draft.extractedRelationship || '',
@@ -98,6 +123,8 @@ export const draftToForm = (draft: GiftRecordT, fallbackDate: string): RecordFor
   gift: draft.gift ?? '',
   price: draft.price ?? '',
   category: draft.category ?? '',
-  eventKind: draft.kind === 'CONDOLENCE' ? 'CONDOLENCE' : 'CELEBRATION',
+  eventCategory: draft.eventCategory ?? '',
+  eventGroup: draft.eventGroup === 'CONDOLENCE' ? 'CONDOLENCE' : 'CELEBRATION',
+  eventDate: draft.eventDate ?? '',
   reminderDate: draft.reminderDate ?? '',
 });

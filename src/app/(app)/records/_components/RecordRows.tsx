@@ -14,6 +14,7 @@ import { useDeleteGiftRecord } from '@/hooks/useGiftRecordMutations';
 import type { GiftRecordT } from '@/types/record';
 import { formatAmount } from '@/utils/formatAmount';
 import { formatDate } from '@/utils/formatDate';
+import { getRecordCategoryLabel } from '@/utils/recordLabel';
 
 type RecordRowsProps = {
   records: GiftRecordT[];
@@ -105,9 +106,9 @@ function RecordRows({
                   {formatAmount(record.amount)}
                 </b>
                 {showCategory ? (
-                  <span className="text-[9px] text-subtle">{record.category}</span>
+                  <span className="text-[9px] text-subtle">{getRecordCategoryLabel(record)}</span>
                 ) : (
-                  <span className="text-[9px] text-subtle">{record.kindLabel}</span>
+                  <span className="text-[9px] text-subtle">{record.recordTypeLabel}</span>
                 )}
               </div>
               <button

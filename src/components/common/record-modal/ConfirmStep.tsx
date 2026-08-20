@@ -2,17 +2,14 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Heart } from 'lucide-react';
-import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { ApiError } from '@/apis/apiClient';
 import Button from '@/components/common/button';
 import DatePicker from '@/components/common/date-picker';
 import RelationPicker from '@/components/common/relation-picker';
-import { useAppUi } from '@/hooks/useAppUi';
-import { usePostCategory } from '@/hooks/useCategoryMutations';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import type { PersonT } from '@/types/person';
+import type { RecordTypeT } from '@/types/record';
 
 import AmountInput from './AmountInput';
 import CategoryPicker from './CategoryPicker';
@@ -24,7 +21,7 @@ import {
   KIND_TABS,
   recordFormSchema,
 } from './recordModal.const';
-import type { KindTabT, RecordFormT } from './recordModal.const';
+import type { RecordFormT } from './recordModal.const';
 
 const fieldClass =
   'h-9 rounded-[10px] border border-line bg-white px-2.5 text-[11px] outline-0 focus:border-[#da897a] focus:shadow-[0_0_0_3px_#ed7b6912]';
@@ -47,8 +44,7 @@ function ConfirmStep({
   onSubModalToggle,
   onSubmit,
 }: ConfirmStepProps) {
-  const { categoriesData: giftCategories } = useGetCategories({ kind: 'GIFT' });
-  const { categoriesData: eventCategories } = useGetCategories({ kind: 'EVENT' });
+  const { categoriesData: giftCategories } = useGetCategories();
 
   const {
     register,
@@ -62,26 +58,19 @@ function ConfirmStep({
     defaultValues,
   });
 
+  const recordType = useWatch({ control, name: 'recordType' });
   const personName = useWatch({ control, name: 'personName' });
   const category = useWatch({ control, name: 'category' });
   const relation = useWatch({ control, name: 'relation' });
-  const eventKind = useWatch({ control, name: 'eventKind' });
+  const eventCategory = useWatch({ control, name: 'eventCategory' });
+  const eventGroup = useWatch({ control, name: 'eventGroup' });
+  const eventDate = useWatch({ control, name: 'eventDate' });
   const price = useWatch({ control, name: 'price' });
   const date = useWatch({ control, name: 'date' });
   const reminderDate = useWatch({ control, name: 'reminderDate' });
 
-  const { showToast } = useAppUi();
-  const { postCategoryMutation, isPostCategoryPending } = usePostCategory();
-
-  const [pickedKind, setPickedKind] = useState<KindTabT | null>(null);
-
-  // AI 초안이 경조사 카테고리를 골라 왔다면 그 탭에서 시작한다.
-  // 목록이 늦게 도착해도 effect 없이 계산으로 따라가도록 파생값으로 둔다.
-  const isDefaultEvent = eventCategories.some(item => item.name === defaultValues.category);
-  const kind: KindTabT = pickedKind ?? (isDefaultEvent ? 'EVENT' : 'GIFT');
-
-  const tab = KIND_TABS.find(item => item.key === kind) ?? KIND_TABS[0];
-  const categories = kind === 'EVENT' ? eventCategories : giftCategories;
+  // AI 초안이 경조사로 왔다면 그 탭에서 시작한다 — 서버가 recordType 을 내려준다.
+  const tab = KIND_TABS.find(item => item.key === recordType) ?? KIND_TABS[0];
 
   /** 자동으로 채워 둔 값인지 — 직접 적은 값은 건드리지 않기 위해 구분한다. */
   const isAutoFilledGift = () =>
@@ -93,24 +82,18 @@ function ConfirmStep({
     }
   };
 
-  const handlePickKind = (next: KindTabT) => {
-    setPickedKind(next);
+  const handlePickKind = (next: RecordTypeT) => {
+    setValue('recordType', next);
 
     if (next === 'EVENT') {
-      fillEventGift(getValues('eventKind'));
-    } else if (isAutoFilledGift()) {
-      // 선물 탭에 축의금·조의금이 남아 있으면 안 된다.
-      setValue('gift', '');
+      fillEventGift(getValues('eventGroup'));
+      // 경조사 탭에는 '받은 이유' 칸이 없으니, 안 보이는 값이 몰래 저장되지 않도록 비운다.
+      setValue('occasion', '');
+      return;
     }
 
-    // 다른 탭에는 없는 카테고리가 남아 있으면 비운다.
-    const nextCategories = next === 'EVENT' ? eventCategories : giftCategories;
-    if (!nextCategories.some(item => item.name === getValues('category'))) {
-      setValue('category', '');
-    }
-
-    // 경조사 탭에는 '받은 이유' 칸이 없으니, 안 보이는 값이 몰래 저장되지 않도록 비운다.
-    if (next === 'EVENT') setValue('occasion', '');
+    // 선물 탭에 축의금·조의금이 남아 있으면 안 된다.
+    if (isAutoFilledGift()) setValue('gift', '');
   };
 
   // 등록된 사람을 고르면 관계까지 채우고, 이후 요청은 personId 로 보낸다.
@@ -120,41 +103,10 @@ function ConfirmStep({
     if (person.relation) setValue('relation', person.relation);
   };
 
-  /**
-   * 경조사는 행사 이름을 직접 적으므로, 없는 이름이면 행사(카테고리)를 먼저 만들고 저장한다.
-   * 서버는 모르는 카테고리 이름을 받으면 '기타'로 처리해 버린다.
-   */
-  const handleFormSubmit = (values: RecordFormT) => {
-    if (!tab.isEvent) {
-      onSubmit(values);
-      return;
-    }
-
-    const name = values.category.trim();
-    if (eventCategories.some(item => item.name === name)) {
-      onSubmit({ ...values, category: name });
-      return;
-    }
-
-    postCategoryMutation(
-      {
-        name,
-        kind: values.eventKind,
-        emoji: values.eventKind === 'CONDOLENCE' ? '🕊️' : '💒',
-        color: values.eventKind === 'CONDOLENCE' ? 'blue' : 'gold',
-      },
-      {
-        onSuccess: created => onSubmit({ ...values, category: created.name }),
-        onError: error =>
-          showToast(error instanceof ApiError ? error.message : '행사를 만들지 못했어요'),
-      }
-    );
-  };
-
   const firstError = Object.values(errors)[0]?.message;
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mx-auto grid size-12 place-items-center rounded-[15px] bg-coral-soft text-coral-deep">
         <Heart size={22} fill="currentColor" />
       </div>
@@ -172,9 +124,9 @@ function ConfirmStep({
               key={key}
               type="button"
               onClick={() => handlePickKind(key)}
-              aria-pressed={kind === key}
+              aria-pressed={recordType === key}
               className={`cursor-pointer rounded-[9px] px-4 py-1.5 text-[11px] font-bold transition ${
-                kind === key
+                recordType === key
                   ? 'bg-coral text-white shadow-[0_2px_6px_#ed7b6930]'
                   : 'text-[#8b857e] hover:text-ink'
               }`}
@@ -189,21 +141,21 @@ function ConfirmStep({
         {/* 경조사는 한 행사에 여러 명을 기록하므로 행사를 맨 먼저 정한다. */}
         {tab.isEvent ? (
           <EventFields
-            kindValue={eventKind}
-            onKindChange={next => {
-              setValue('eventKind', next);
+            groupValue={eventGroup}
+            onGroupChange={next => {
+              setValue('eventGroup', next);
               fillEventGift(next);
+              // 고른 유형이 다른 그룹 것이면 어긋나므로 비운다.
+              setValue('eventCategory', '');
             }}
-            nameValue={category}
-            onNameChange={name => setValue('category', name)}
-            events={eventCategories}
-            onCreated={(picked, pickedDate) => {
-              setValue('category', picked.name);
-              if (picked.kind !== 'GIFT') setValue('eventKind', picked.kind);
-              // 행사일을 모르는 행사면 이미 적어 둔 날짜를 건드리지 않는다.
-              if (pickedDate) setValue('date', pickedDate);
+            categoryValue={eventCategory}
+            onPick={picked => {
+              setValue('eventCategory', picked.label);
+              setValue('eventGroup', picked.group);
+              fillEventGift(picked.group);
             }}
-            onSubModalToggle={onSubModalToggle}
+            dateValue={eventDate}
+            onDateChange={next => setValue('eventDate', next)}
             labelClass={labelClass}
             labelTextClass={labelTextClass}
             fieldClass={fieldClass}
@@ -265,9 +217,8 @@ function ConfirmStep({
             <span className={labelTextClass}>{tab.categoryLabel}</span>
             <CategoryPicker
               value={category}
-              categories={categories}
+              categories={giftCategories}
               onChange={name => setValue('category', name)}
-              addKind={GIFT_CATEGORY_ADD.kind}
               addTitle={GIFT_CATEGORY_ADD.title}
               addNameLabel={GIFT_CATEGORY_ADD.nameLabel}
               addPlaceholder={GIFT_CATEGORY_ADD.placeholder}
@@ -291,7 +242,7 @@ function ConfirmStep({
       {firstError ? <p className="mt-3 text-[10px] text-coral-dark">{firstError}</p> : null}
 
       <div className="sticky -bottom-[30px] mt-5 bg-[#fffdfa] pt-3">
-        <Button type="submit" full disabled={isPending || isPostCategoryPending}>
+        <Button type="submit" full disabled={isPending}>
           <Heart size={17} /> {isPending ? '저장 중…' : '마음 기록하기'}
         </Button>
       </div>

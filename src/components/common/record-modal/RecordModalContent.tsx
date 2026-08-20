@@ -74,17 +74,24 @@ function RecordModalContent() {
   };
 
   const handleSave = (values: RecordFormT) => {
+    const isEvent = values.recordType === 'EVENT';
+
     const body = {
+      recordType: values.recordType,
       // 목록에서 고른 사람이면 id 로 확실히 연결하고, 아니면 이름으로 찾거나 새로 만들게 둔다.
       personId: values.personId,
       personName: values.personName,
       relation: values.relation || undefined,
       date: values.date,
       reminderDate: values.reminderDate || undefined,
-      occasion: values.occasion || undefined,
       gift: values.gift,
-      category: values.category,
       price: values.price || undefined,
+      // 선물이면 카테고리와 받은 이유를, 경조사면 행사 유형과 행사일을 보낸다.
+      // 반대쪽 값은 서버가 무시하지만, 안 보이는 값이 저장되지 않도록 아예 빼고 보낸다.
+      occasion: isEvent ? undefined : values.occasion || undefined,
+      category: isEvent ? undefined : values.category,
+      eventCategory: isEvent ? values.eventCategory : undefined,
+      eventDate: isEvent ? values.eventDate || undefined : undefined,
     };
 
     const onSuccess = () => {

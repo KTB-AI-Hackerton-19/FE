@@ -1,5 +1,5 @@
 import { API } from '@/consts/api';
-import type { AccentT, CategoryT, KindT } from '@/types/category';
+import type { AccentT, CategoryT } from '@/types/category';
 
 import { apiClient } from './apiClient';
 
@@ -9,10 +9,6 @@ export type PostCategoryRequestT = {
   color?: AccentT;
   displayOrder?: number;
   active?: boolean;
-  /** 속할 탭. 생략하면 GIFT */
-  kind?: KindT;
-  /** 행사일 (YYYY-MM-DD). 경조사에만 쓰이고 선물 카테고리로 보내면 무시된다 */
-  eventDate?: string;
 };
 
 export const postCategory = (body: PostCategoryRequestT) =>
