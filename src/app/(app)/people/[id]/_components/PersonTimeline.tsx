@@ -95,8 +95,8 @@ function PersonTimeline({ id }: PersonTimelineProps) {
                 </span>
               ) : null}
               {/* 목록 카드와 같은 표시 — 선물 아이콘에 개수만 붙인다 */}
-              <span className="flex items-center gap-0.5 text-[11px] font-bold text-[#c98878]">
-                <Gift size={13} strokeWidth={2.4} />
+              <span className="flex items-center gap-1 text-[13px] font-extrabold text-[#c98878]">
+                <Gift size={15} strokeWidth={2.6} />
                 받은 마음 {personData.person.giftCount}개
               </span>
             </div>
