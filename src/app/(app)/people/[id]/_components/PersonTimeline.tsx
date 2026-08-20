@@ -14,6 +14,8 @@ import { useDeletePeople } from '@/hooks/usePeopleMutations';
 import { formatDate, formatShortDate } from '@/utils/formatDate';
 import { getRecordSubtitle } from '@/utils/recordLabel';
 
+import PersonRecommendSection from './PersonRecommendSection';
+
 type PersonTimelineProps = {
   id: number;
 };
@@ -132,6 +134,8 @@ function PersonTimeline({ id }: PersonTimelineProps) {
               </article>
             ))}
           </div>
+
+          <PersonRecommendSection id={id} name={personData.person.name} />
         </>
       ) : null}
 
