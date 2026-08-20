@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { getPersonRecommendations } from '@/apis/getPersonRecommendations';
 import Button from '@/components/common/button';
-import GiftCard from '@/components/common/gift-card';
+import GiftCardList from '@/components/common/gift-card/GiftCardList';
 import SectionHeading from '@/components/common/section-heading';
 import ThankYouNote from '@/components/common/thank-you-note';
 import { QUERY_KEY } from '@/consts/api';
@@ -69,12 +69,7 @@ function PersonRecommendSection({ id, name }: PersonRecommendSectionProps) {
         }
       />
 
-      {/* 모바일은 옆으로 넘겨 보고, 넓은 화면에서는 세 장을 한 줄에 편다. */}
-      <div className="flex snap-x snap-mandatory gap-[15px] overflow-auto lg:grid lg:grid-cols-3 lg:overflow-visible">
-        {gifts.map((gift, index) => (
-          <GiftCard key={gift.id} gift={gift} index={index} />
-        ))}
-      </div>
+      <GiftCardList gifts={gifts} />
 
       {thankYouMessage ? <ThankYouNote message={thankYouMessage} /> : null}
     </section>

@@ -10,7 +10,7 @@ import GiftThumbnail from './GiftThumbnail';
 const TONES = ['bg-[#e9f1ed]', 'bg-[#f5ede2]', 'bg-[#f7e9e7]'];
 
 const footerClass =
-  'mt-2.5 flex w-full items-center justify-center gap-[5px] border-t border-line pt-[11px] text-[10px] font-bold';
+  'mt-auto flex w-full items-center justify-center gap-[5px] border-t border-line px-[15px] py-[11px] text-[10px] font-bold';
 
 type GiftCardProps = {
   gift: RecommendedGiftT;
@@ -18,11 +18,16 @@ type GiftCardProps = {
   index: number;
 };
 
-/** 추천 선물 한 장. 홈과 사람 상세가 함께 쓴다. */
+/**
+ * 추천 선물 한 장. 홈과 사람 상세가 함께 쓴다.
+ *
+ * 넓은 화면에서는 subgrid 로 바깥 격자의 줄을 그대로 쓴다 —
+ * 이름·가격·이유 칸이 세 장 중 가장 큰 것에 맞춰지고, 다 짧으면 같이 줄어든다.
+ */
 function GiftCard({ gift, index }: GiftCardProps) {
   return (
-    <article className="min-w-[78%] snap-start overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_14px_30px_#503e3514] lg:min-w-0">
-      <div className="relative h-[125px]">
+    <article className="flex min-w-[78%] snap-start flex-col overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_14px_30px_#503e3514] lg:row-span-5 lg:grid lg:min-w-0 lg:grid-rows-subgrid">
+      <div className="relative h-[150px]">
         <GiftThumbnail
           imageUrl={gift.imageUrl}
           emoji={gift.emoji}
@@ -33,27 +38,26 @@ function GiftCard({ gift, index }: GiftCardProps) {
           {gift.tag}
         </span>
       </div>
-      <div className="p-[15px]">
-        <h3 className="mb-[3px] text-[13px]">{gift.name}</h3>
-        <strong className="text-xs text-[#dc725f]">{gift.price}</strong>
-        {/* 이유 길이가 제각각이라 두 줄로 자른다 — 카드 높이가 들쭉날쭉하면 줄이 어긋난다. */}
-        <p className="line-clamp-2 h-[29px] text-[9px] leading-[1.55] text-[#8e8981]">
-          {gift.reason}
-        </p>
-        {/* 구매 링크는 AI가 상품을 찾았을 때만 내려온다 */}
-        {gift.productUrl ? (
-          <a
-            href={gift.productUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${footerClass} cursor-pointer text-[#5c7769]`}
-          >
-            이 선물로 마음 전하기 <ArrowRight size={16} />
-          </a>
-        ) : (
-          <p className={`${footerClass} text-subtle`}>구매 링크를 찾지 못했어요</p>
-        )}
-      </div>
+
+      <h3 className="px-[15px] pt-[15px] text-[13px] leading-[1.45]">{gift.name}</h3>
+      <strong className="px-[15px] pt-[3px] text-xs text-[#dc725f]">{gift.price}</strong>
+      <p className="px-[15px] pt-[5px] pb-[15px] text-[9px] leading-[1.55] text-[#8e8981]">
+        {gift.reason}
+      </p>
+
+      {/* 구매 링크는 AI가 상품을 찾았을 때만 내려온다 */}
+      {gift.productUrl ? (
+        <a
+          href={gift.productUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${footerClass} cursor-pointer text-[#5c7769]`}
+        >
+          이 선물로 마음 전하기 <ArrowRight size={16} />
+        </a>
+      ) : (
+        <p className={`${footerClass} text-subtle`}>구매 링크를 찾지 못했어요</p>
+      )}
     </article>
   );
 }

@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import { getRecommendations } from '@/apis/getRecommendations';
 import Button from '@/components/common/button';
-import GiftCard from '@/components/common/gift-card';
+import GiftCardList from '@/components/common/gift-card/GiftCardList';
 import SectionHeading from '@/components/common/section-heading';
 import ThankYouNote from '@/components/common/thank-you-note';
 import { QUERY_KEY } from '@/consts/api';
@@ -78,11 +78,7 @@ function RecommendSection() {
         }
       />
 
-      <section className="flex snap-x snap-mandatory gap-[15px] overflow-auto lg:grid lg:grid-cols-3 lg:overflow-visible">
-        {items.map(({ group, gift }, index) => (
-          <GiftCard key={`${group.personId}-${gift.id}`} gift={gift} index={index} />
-        ))}
-      </section>
+      <GiftCardList gifts={items.map(({ gift }) => gift)} />
 
       {thankYouMessage ? <ThankYouNote message={thankYouMessage} /> : null}
     </>
