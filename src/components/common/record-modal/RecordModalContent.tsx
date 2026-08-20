@@ -143,9 +143,10 @@ function RecordModalContent() {
     }
 
     // AI가 만든 DRAFT면 확정(PATCH), 직접 입력이면 새로 등록(POST).
+    // 확정할 때도 보낸 사람을 '사람들'에 남긴다 — 직접 입력과 결과가 달라질 이유가 없다.
     if (drafts.length > 0) {
       patchGiftRecordMutation(
-        { id: drafts[0].id, ...body, confirm: true },
+        { id: drafts[0].id, ...body, registerPerson: !isEvent, confirm: true },
         { onSuccess, onError: handleError }
       );
       return;
