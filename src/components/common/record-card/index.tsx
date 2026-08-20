@@ -10,7 +10,8 @@ type RecordCardProps = {
 
 function RecordCard({ record }: RecordCardProps) {
   return (
-    <article className="relative flex min-w-0 gap-[13px] rounded-[15px] border border-line bg-white p-4">
+    // 이모지가 글 첫 줄에 붙지 않도록 세로 가운데로 맞춘다
+    <article className="relative flex min-w-0 items-center gap-[13px] rounded-[15px] border border-line bg-white p-4">
       <div className={recordEmojiStyles({ accent: record.color })}>{record.emoji}</div>
 
       <div className="min-w-0 flex-1">
