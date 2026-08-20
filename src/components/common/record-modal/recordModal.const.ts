@@ -28,7 +28,7 @@ export const KIND_TABS = [
     categoryLabel: '선물 카테고리',
     giftLabel: '받은 선물',
     giftPlaceholder: '스타벅스 케이크',
-    pricePlaceholder: '35,000원',
+    pricePlaceholder: '35,000',
     showOccasion: true,
     isEvent: false,
   },
@@ -39,7 +39,7 @@ export const KIND_TABS = [
     // 경조사에서 이 칸에 들어가는 값은 조의금·축의금이라 '선물'로 부르면 어색하다.
     giftLabel: '받은 마음',
     giftPlaceholder: '축의금',
-    pricePlaceholder: '100,000원',
+    pricePlaceholder: '100,000',
     // 행사 이름이 곧 사유라 '받은 이유'는 겹친다.
     showOccasion: false,
     // 경조사는 목록에서 고르지 않고 경사·조사 + 이름을 폼에서 직접 적는다.

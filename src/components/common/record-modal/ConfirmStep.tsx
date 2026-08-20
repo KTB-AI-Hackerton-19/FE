@@ -13,6 +13,7 @@ import { usePostCategory } from '@/hooks/useCategoryMutations';
 import { useGetCategories } from '@/hooks/useGetCategories';
 import type { PersonT } from '@/types/person';
 
+import AmountInput from './AmountInput';
 import CategoryPicker from './CategoryPicker';
 import EventFields from './EventFields';
 import PersonPicker from './PersonPicker';
@@ -58,6 +59,7 @@ function ConfirmStep({
   const personName = useWatch({ control, name: 'personName' });
   const category = useWatch({ control, name: 'category' });
   const eventKind = useWatch({ control, name: 'eventKind' });
+  const price = useWatch({ control, name: 'price' });
   const date = useWatch({ control, name: 'date' });
   const reminderDate = useWatch({ control, name: 'reminderDate' });
 
@@ -217,10 +219,15 @@ function ConfirmStep({
           <span className={labelTextClass}>{tab.giftLabel}</span>
           <input className={fieldClass} placeholder={tab.giftPlaceholder} {...register('gift')} />
         </label>
-        <label className={labelClass}>
+        <div className={labelClass}>
           <span className={labelTextClass}>금액</span>
-          <input className={fieldClass} placeholder={tab.pricePlaceholder} {...register('price')} />
-        </label>
+          <AmountInput
+            value={price}
+            onChange={next => setValue('price', next)}
+            placeholder={tab.pricePlaceholder}
+            className={fieldClass}
+          />
+        </div>
         {tab.isEvent ? null : (
           <div className={`${labelClass} col-span-2`}>
             <span className={labelTextClass}>{tab.categoryLabel}</span>
