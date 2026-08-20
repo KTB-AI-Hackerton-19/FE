@@ -52,6 +52,34 @@ export type PatchGiftRecordThankedRequestT = { id: number; thanked: boolean };
 export const patchGiftRecordThanked = ({ id, thanked }: PatchGiftRecordThankedRequestT) =>
   apiClient.patch<GiftRecordT>(API.GIFT_RECORD_THANKED(id), { thanked });
 
+/** 한 행사에 온 사람 한 명 — 사람마다 다른 값만 담는다 */
+export type GiftRecordGuestT = {
+  /** 목록에서 고른 사람 */
+  personId?: number;
+  /** 사람으로 등록하지 않는 이름 (경조사 하객) */
+  guestName?: string;
+  price?: string;
+  relation?: string;
+};
+
+/** 공통 항목은 밖에, 사람마다 다른 값은 guests 안에 담는다. */
+export type PostGiftRecordsBulkRequestT = Omit<
+  PostGiftRecordRequestT,
+  'personId' | 'personName' | 'guestName' | 'price' | 'relation'
+> & { guests: GiftRecordGuestT[] };
+
+/** 한 행사에 여러 명을 한 번에 등록한다 — 사람 수만큼 요청을 나누지 않는다. */
+export const postGiftRecordsBulk = (body: PostGiftRecordsBulkRequestT) =>
+  apiClient.post<GiftRecordT[]>(API.GIFT_RECORDS_BULK, body);
+
+export type PatchGiftRecordsBulkRequestT = Omit<PatchGiftRecordRequestT, 'id'> & {
+  ids: number[];
+};
+
+/** AI 가 만든 DRAFT 여러 건을 한 번에 확정한다. */
+export const patchGiftRecordsBulk = (body: PatchGiftRecordsBulkRequestT) =>
+  apiClient.patch<GiftRecordT[]>(API.GIFT_RECORDS_BULK, body);
+
 export type PostGiftRecordExtractRequestT = { imageKey: string };
 
 export type PostGiftRecordExtractResponseT = {

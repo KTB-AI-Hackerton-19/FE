@@ -7,8 +7,10 @@ import {
   deleteGiftRecords,
   patchGiftRecord,
   patchGiftRecordThanked,
+  patchGiftRecordsBulk,
   postGiftRecord,
   postGiftRecordExtract,
+  postGiftRecordsBulk,
 } from '@/apis/giftRecord';
 import { uploadGiftImage } from '@/apis/uploadImage';
 import { QUERY_KEY } from '@/consts/api';
@@ -74,6 +76,26 @@ export const usePostGiftRecordExtract = () => {
     });
 
   return { postGiftRecordExtractMutation, isPostGiftRecordExtractPending };
+};
+
+/** 한 행사에 여러 명을 한 번에 등록한다. */
+export const usePostGiftRecordsBulk = () => {
+  const invalidate = useInvalidateRecords();
+
+  const { mutate: postGiftRecordsBulkMutation, isPending: isPostGiftRecordsBulkPending } =
+    useMutation({ mutationFn: postGiftRecordsBulk, onSuccess: invalidate });
+
+  return { postGiftRecordsBulkMutation, isPostGiftRecordsBulkPending };
+};
+
+/** AI 가 만든 DRAFT 여러 건을 한 번에 확정한다. */
+export const usePatchGiftRecordsBulk = () => {
+  const invalidate = useInvalidateRecords();
+
+  const { mutate: patchGiftRecordsBulkMutation, isPending: isPatchGiftRecordsBulkPending } =
+    useMutation({ mutationFn: patchGiftRecordsBulk, onSuccess: invalidate });
+
+  return { patchGiftRecordsBulkMutation, isPatchGiftRecordsBulkPending };
 };
 
 export const useDeleteGiftRecord = () => {
